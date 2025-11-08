@@ -1,0 +1,13 @@
+> I want to create a trivia game that is like Jackbox in the sense that we have a "host" that can create a lobby. Then other people on their phones will go to the site and join         
+that lobby with a code. Then once everyone is in the lobby we can start a round of trivia. We would have a central script for all the trivia questions and answers (it could just be     
+a json object or something so I can keep updating and adding to it). \
+\
+I want to lay out the skeleton first. Ideally I like to use react as my frontend and flask as my backend. We want to make it a fun and nicely animated modern clean game. It should      
+feel fun and bubbly! Lets first focus on setting up a skeleton. LEts get some fake test trivia questions with multiple choice. Ill open multiple chrome profiles to be able to join      
+once as a host and create the lobby (host doesnt get to play, they just create the lobby) but also open another chrome profile to join as users. We should have robust mechanisms so     
+lets say I close the tab by mistake, if I come back, I can rejoin back where I was. ULTRATHINK through a good skeleton. We want a nice simple architecture. We need persistence. We      
+need the ability to join or create lobbies. We need to be able to start the trivia game when everyone is in. People should be able to choose their own display name). We want a nice     
+clean simple game loop. Dont code yet, lets first think through everything that might be required in a game like this. \
+\
+What likely will happen is I create a lobby as a host on my laptop and put it on my TV. Then everyone on their mobile phones (including me) will join that lobby. Then as the host on    
+ the laptop, I can start the game once everyone is in. \

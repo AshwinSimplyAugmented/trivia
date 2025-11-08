@@ -1,0 +1,67 @@
+{
+  "mode": "free_for_all",
+  "mode_display_name": "Free For All",
+  "time_per_question": 15,
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the capital of France?",
+      "answers": ["London", "Paris", "Berlin", "Madrid"],
+      "correct": 1
+    },
+    {
+      "id": 2,
+      "question": "Which planet is known as the Red Planet?",
+      "answers": ["Venus", "Jupiter", "Mars", "Saturn"],
+      "correct": 2
+    },
+    {
+      "id": 3,
+      "question": "Who painted the Mona Lisa?",
+      "answers": ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"],
+      "correct": 2
+    },
+    {
+      "id": 4,
+      "question": "What is the largest ocean on Earth?",
+      "answers": ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+      "correct": 3
+    },
+    {
+      "id": 5,
+      "question": "In which year did World War II end?",
+      "answers": ["1943", "1944", "1945", "1946"],
+      "correct": 2
+    },
+    {
+      "id": 6,
+      "question": "What is the smallest prime number?",
+      "answers": ["0", "1", "2", "3"],
+      "correct": 2
+    },
+    {
+      "id": 7,
+      "question": "Which country is home to the kangaroo?",
+      "answers": ["New Zealand", "Australia", "South Africa", "Brazil"],
+      "correct": 1
+    },
+    {
+      "id": 8,
+      "question": "What is the chemical symbol for gold?",
+      "answers": ["Go", "Gd", "Au", "Ag"],
+      "correct": 2
+    },
+    {
+      "id": 9,
+      "question": "How many continents are there?",
+      "answers": ["5", "6", "7", "8"],
+      "correct": 2
+    },
+    {
+      "id": 10,
+      "question": "Who wrote 'Romeo and Juliet'?",
+      "answers": ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+      "correct": 1
+    }
+  ]
+}

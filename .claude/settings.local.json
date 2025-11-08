@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\Users\\kadar\\Documents\\MISC\\trivia\" /s /b)",
+      "Bash(pip install:*)",
+      "Bash(python -m pip install:*)",
+      "Bash(python3 -m pip install:*)",
+      "Bash(npm start)",
+      "Bash(timeout:*)",
+      "Bash(find:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
