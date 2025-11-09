@@ -8,7 +8,10 @@
       "Bash(npm start)",
       "Bash(timeout:*)",
       "Bash(find:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(sqlite3:*)",
+      "Bash(python app.py:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

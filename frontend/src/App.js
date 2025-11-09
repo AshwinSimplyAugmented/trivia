@@ -1,33 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
-import io from 'socket.io-client';
 import {
   Gamepad2, Users, Play, X, Settings, Clock, Check,
   AlertCircle, Crown, Trophy, Zap, Target, Shield,
   Loader2, Info, CheckCircle, XCircle, AlertTriangle
 } from 'lucide-react';
 
-// In dev, connect to backend on port 5000. In production, same origin.
-const isDev = window.location.hostname === 'localhost' && window.location.port === '3000';
-const socket = io(isDev ? 'http://localhost:5000' : undefined);
-
-// Helper to generate UUID
-function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-
-// Get or create session ID
-function getSessionId() {
-  let sessionId = localStorage.getItem('sessionId');
-  if (!sessionId) {
-    sessionId = generateUUID();
-    localStorage.setItem('sessionId', sessionId);
-  }
-  return sessionId;
-}
+// Import centralized socket and utilities
+import {
+  socket,
+  initializeSocketListeners,
+  cleanupSocketListeners,
+  createLobby,
+  rejoinHost,
+  joinLobby,
+  startGame,
+  selectGameMode,
+  submitAnswer,
+  leaveLobby,
+  disbandLobby,
+  reconnectToLobby
+} from './api/socket';
+import { getSessionId } from './utils/helpers';
 
 function App() {
   // View states: home, host, host_mode_select, host_question, host_reveal, host_results
@@ -99,17 +92,7 @@ function App() {
 
       if (storedLobbyCode && storedSessionId) {
         try {
-          const apiUrl = isDev ? 'http://localhost:5000/api/reconnect' : '/api/reconnect';
-          const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              sessionId: storedSessionId,
-              lobbyCode: storedLobbyCode
-            })
-          });
-
-          const data = await response.json();
+          const data = await reconnectToLobby(storedSessionId, storedLobbyCode);
 
           if (data.success) {
             setLobbyCode(data.lobbyCode);
@@ -117,19 +100,12 @@ function App() {
 
             if (data.role === 'host') {
               setView('host');
-              socket.emit('rejoin_host', {
-                code: data.lobbyCode,
-                sessionId: storedSessionId
-              });
+              rejoinHost(data.lobbyCode, storedSessionId);
             } else if (data.role === 'player') {
               setView('player');
               setDisplayName(data.displayName);
               setPlayerId(storedSessionId);
-              socket.emit('join_lobby', {
-                code: data.lobbyCode,
-                name: data.displayName,
-                sessionId: storedSessionId
-              });
+              joinLobby(data.lobbyCode, data.displayName, storedSessionId);
             }
           } else {
             // Reconnection failed - lobby doesn't exist anymore
@@ -157,183 +133,159 @@ function App() {
     attemptReconnect();
   }, []);
 
+  // Initialize socket listeners
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('Connected to server');
-    });
-
-    socket.on('lobby_created', (data) => {
-      setLobbyCode(data.code);
-      setView('host');
-      localStorage.setItem('lobbyCode', data.code);
-      localStorage.setItem('role', 'host');
-      if (data.sessionId) {
-        localStorage.setItem('sessionId', data.sessionId);
-        setSessionId(data.sessionId);
-      }
-    });
-
-    socket.on('lobby_joined', (data) => {
-      setLobbyCode(data.code);
-      setPlayerId(data.sessionId);
-      setDisplayName(data.name);
-      setView('player');
-      localStorage.setItem('lobbyCode', data.code);
-      localStorage.setItem('role', 'player');
-      localStorage.setItem('displayName', data.name);
-      if (data.sessionId) {
-        localStorage.setItem('sessionId', data.sessionId);
-        setSessionId(data.sessionId);
-      }
-    });
-
-    socket.on('players_updated', (data) => {
-      setPlayers(data.players);
-      // Update my score if I'm a player
-      const me = data.players.find(p => p.id === playerId);
-      if (me) {
-        setMyScore(me.score);
-      }
-    });
-
-    socket.on('mode_selection_started', () => {
-      const role = localStorage.getItem('role');
-      if (role === 'host') {
-        setView('host_mode_select');
-      } else {
-        setView('player_waiting');
-      }
-    });
-
-    socket.on('game_mode_selected', (data) => {
-      console.log('Game mode selected:', data.mode_name);
-    });
-
-    socket.on('question_started', (data) => {
-      setCurrentQuestion(data.question);
-      setCurrentAnswers(data.answers);
-      setQuestionIndex(data.question_index);
-      setTotalQuestions(data.total_questions);
-      setTimeLimit(data.time_limit);
-      setTimeRemaining(data.time_limit);
-      setSelectedAnswer(null);
-      selectedAnswerRef.current = null;
-      setCorrectAnswer(null);
-      setAnswerStats([]);
-      setPointsEarned(0);
-
-      const role = localStorage.getItem('role');
-      if (role === 'host') {
-        setView('host_question');
-      } else {
-        setView('player_question');
-      }
-
-      // Start timer
-      startTimer(data.time_limit);
-    });
-
-    socket.on('answer_submitted', (data) => {
-      setSelectedAnswer(data.answer_index);
-      selectedAnswerRef.current = data.answer_index;
-      console.log('Answer submitted, index:', data.answer_index);
-    });
-
-    socket.on('question_ended', (data) => {
-      console.log('Question ended data:', data);
-      console.log('My selectedAnswer from ref:', selectedAnswerRef.current);
-      console.log('My playerId:', playerId);
-
-      setCorrectAnswer(data.correct_answer);
-      setAnswerStats(data.answer_stats);
-
-      // Calculate points earned for this player using ref
-      const myAnswerIndex = selectedAnswerRef.current;
-      const myAnswerData = myAnswerIndex !== null ? data.answer_stats[myAnswerIndex]?.players?.find(
-        p => p.session_id === playerId
-      ) : null;
-
-      console.log('My answer index:', myAnswerIndex);
-      console.log('My answer data:', myAnswerData);
-
-      if (myAnswerData) {
-        setPointsEarned(myAnswerData.points);
-        console.log('Points earned:', myAnswerData.points);
-      } else {
+    initializeSocketListeners({
+      onLobbyCreated: (data) => {
+        setLobbyCode(data.code);
+        setView('host');
+        localStorage.setItem('lobbyCode', data.code);
+        localStorage.setItem('role', 'host');
+        if (data.sessionId) {
+          localStorage.setItem('sessionId', data.sessionId);
+          setSessionId(data.sessionId);
+        }
+      },
+      onLobbyJoined: (data) => {
+        setLobbyCode(data.code);
+        setPlayerId(data.sessionId);
+        setDisplayName(data.name);
+        setView('player');
+        localStorage.setItem('lobbyCode', data.code);
+        localStorage.setItem('role', 'player');
+        localStorage.setItem('displayName', data.name);
+        if (data.sessionId) {
+          localStorage.setItem('sessionId', data.sessionId);
+          setSessionId(data.sessionId);
+        }
+      },
+      onPlayersUpdated: (data) => {
+        setPlayers(data.players);
+        // Update my score if I'm a player
+        const me = data.players.find(p => p.id === playerId);
+        if (me) {
+          setMyScore(me.score);
+        }
+      },
+      onModeSelectionStarted: () => {
+        const role = localStorage.getItem('role');
+        if (role === 'host') {
+          setView('host_mode_select');
+        } else {
+          setView('player_waiting');
+        }
+      },
+      onGameModeSelected: (data) => {
+        console.log('Game mode selected:', data.mode_name);
+      },
+      onQuestionStarted: (data) => {
+        setCurrentQuestion(data.question);
+        setCurrentAnswers(data.answers);
+        setQuestionIndex(data.question_index);
+        setTotalQuestions(data.total_questions);
+        setTimeLimit(data.time_limit);
+        setTimeRemaining(data.time_limit);
+        setSelectedAnswer(null);
+        selectedAnswerRef.current = null;
+        setCorrectAnswer(null);
+        setAnswerStats([]);
         setPointsEarned(0);
-        console.log('No answer data found, setting points to 0');
+
+        const role = localStorage.getItem('role');
+        if (role === 'host') {
+          setView('host_question');
+        } else {
+          setView('player_question');
+        }
+
+        // Start timer
+        startTimer(data.time_limit);
+      },
+      onAnswerSubmitted: (data) => {
+        setSelectedAnswer(data.answer_index);
+        selectedAnswerRef.current = data.answer_index;
+        console.log('Answer submitted, index:', data.answer_index);
+      },
+      onQuestionEnded: (data) => {
+        console.log('Question ended data:', data);
+        console.log('My selectedAnswer from ref:', selectedAnswerRef.current);
+        console.log('My playerId:', playerId);
+
+        setCorrectAnswer(data.correct_answer);
+        setAnswerStats(data.answer_stats);
+
+        // Calculate points earned for this player using ref
+        const myAnswerIndex = selectedAnswerRef.current;
+        const myAnswerData = myAnswerIndex !== null ? data.answer_stats[myAnswerIndex]?.players?.find(
+          p => p.session_id === playerId
+        ) : null;
+
+        console.log('My answer index:', myAnswerIndex);
+        console.log('My answer data:', myAnswerData);
+
+        if (myAnswerData) {
+          setPointsEarned(myAnswerData.points);
+          console.log('Points earned:', myAnswerData.points);
+        } else {
+          setPointsEarned(0);
+          console.log('No answer data found, setting points to 0');
+        }
+
+        const role = localStorage.getItem('role');
+        if (role === 'host') {
+          setView('host_reveal');
+        } else {
+          setView('player_reveal');
+        }
+
+        // Clear timer
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+      },
+      onGameEnded: (data) => {
+        setFinalScores(data.final_scores);
+        setWinner(data.winner);
+
+        const role = localStorage.getItem('role');
+        if (role === 'host') {
+          setView('host_results');
+        } else {
+          setView('player_results');
+        }
+
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+      },
+      onError: (data) => {
+        setError(data.message);
+      },
+      onLobbyLeft: () => {
+        localStorage.removeItem('lobbyCode');
+        localStorage.removeItem('role');
+        localStorage.removeItem('displayName');
+        setView('home');
+        setLobbyCode('');
+        setPlayers([]);
+        setDisplayName('');
+        setPlayerId('');
+      },
+      onLobbyDisbanded: (data) => {
+        showToast(data.message, 'warning');
+        localStorage.removeItem('lobbyCode');
+        localStorage.removeItem('role');
+        localStorage.removeItem('displayName');
+        setView('home');
+        setLobbyCode('');
+        setPlayers([]);
+        setDisplayName('');
+        setPlayerId('');
       }
-
-      const role = localStorage.getItem('role');
-      if (role === 'host') {
-        setView('host_reveal');
-      } else {
-        setView('player_reveal');
-      }
-
-      // Clear timer
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    });
-
-    socket.on('game_ended', (data) => {
-      setFinalScores(data.final_scores);
-      setWinner(data.winner);
-
-      const role = localStorage.getItem('role');
-      if (role === 'host') {
-        setView('host_results');
-      } else {
-        setView('player_results');
-      }
-
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    });
-
-    socket.on('error', (data) => {
-      setError(data.message);
-    });
-
-    socket.on('lobby_left', () => {
-      localStorage.removeItem('lobbyCode');
-      localStorage.removeItem('role');
-      localStorage.removeItem('displayName');
-      setView('home');
-      setLobbyCode('');
-      setPlayers([]);
-      setDisplayName('');
-      setPlayerId('');
-    });
-
-    socket.on('lobby_disbanded', (data) => {
-      showToast(data.message, 'warning');
-      localStorage.removeItem('lobbyCode');
-      localStorage.removeItem('role');
-      localStorage.removeItem('displayName');
-      setView('home');
-      setLobbyCode('');
-      setPlayers([]);
-      setDisplayName('');
-      setPlayerId('');
     });
 
     return () => {
-      socket.off('connect');
-      socket.off('lobby_created');
-      socket.off('lobby_joined');
-      socket.off('players_updated');
-      socket.off('mode_selection_started');
-      socket.off('game_mode_selected');
-      socket.off('question_started');
-      socket.off('answer_submitted');
-      socket.off('question_ended');
-      socket.off('game_ended');
-      socket.off('error');
-      socket.off('lobby_left');
-      socket.off('lobby_disbanded');
+      cleanupSocketListeners();
     };
   }, [playerId]);
 
@@ -355,41 +307,41 @@ function App() {
     }, 1000);
   };
 
-  const createLobby = () => {
-    socket.emit('create_lobby', { sessionId });
+  const handleCreateLobby = () => {
+    createLobby(sessionId);
   };
 
-  const joinLobby = () => {
+  const handleJoinLobby = () => {
     if (!joinCode || !displayName) {
       setError('Please enter lobby code and name');
       return;
     }
-    socket.emit('join_lobby', { code: joinCode, name: displayName, sessionId });
+    joinLobby(joinCode, displayName, sessionId);
   };
 
-  const startGame = () => {
-    socket.emit('start_game', { code: lobbyCode });
+  const handleStartGame = () => {
+    startGame(lobbyCode);
   };
 
-  const selectGameMode = (mode) => {
-    socket.emit('select_game_mode', { code: lobbyCode, mode });
+  const handleSelectGameMode = (mode) => {
+    selectGameMode(lobbyCode, mode);
   };
 
-  const submitAnswer = (answerIndex) => {
+  const handleSubmitAnswer = (answerIndex) => {
     if (selectedAnswer !== null) return; // Already answered
-    socket.emit('submit_answer', { question_index: questionIndex, answer_index: answerIndex });
+    submitAnswer(questionIndex, answerIndex);
   };
 
-  const leaveLobby = () => {
-    socket.emit('leave_lobby', {});
+  const handleLeaveLobby = () => {
+    leaveLobby();
   };
 
-  const disbandLobby = () => {
+  const handleDisbandLobby = () => {
     showConfirm(
       'Disband Lobby?',
       'Are you sure you want to disband this lobby? All players will be kicked out.',
       () => {
-        socket.emit('disband_lobby', { code: lobbyCode });
+        disbandLobby(lobbyCode);
         localStorage.removeItem('lobbyCode');
         localStorage.removeItem('role');
         localStorage.removeItem('displayName');
@@ -489,7 +441,7 @@ function App() {
       <div className="container">
         <h1><Gamepad2 size={48} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Trivia Party</h1>
 
-        <button onClick={createLobby}>
+        <button onClick={handleCreateLobby}>
           <Crown size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
           Create Lobby (Host)
         </button>
@@ -512,7 +464,7 @@ function App() {
           maxLength={20}
         />
 
-        <button onClick={joinLobby}>
+        <button onClick={handleJoinLobby}>
           <Users size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
           Join Lobby
         </button>
@@ -549,12 +501,12 @@ function App() {
           ))}
         </div>
 
-        <button onClick={startGame} disabled={players.length === 0}>
+        <button onClick={handleStartGame} disabled={players.length === 0}>
           <Play size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
           Start Game
         </button>
 
-        <button onClick={disbandLobby} className="btn-danger">
+        <button onClick={handleDisbandLobby} className="btn-danger">
           <X size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
           Disband Lobby
         </button>
@@ -569,7 +521,7 @@ function App() {
         <h1><Target size={40} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Select Game Mode</h1>
 
         <div className="game-modes">
-          <div className="mode-card" onClick={() => selectGameMode('ffa')}>
+          <div className="mode-card" onClick={() => handleSelectGameMode('ffa')}>
             <h2><Zap size={28} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> Free For All</h2>
             <p>Every player for themselves! Answer fast to earn more points.</p>
           </div>
@@ -592,7 +544,7 @@ function App() {
   if (view === 'host_question') {
     return renderWithNotifications(
       <div className="host-fullscreen">
-        <button onClick={disbandLobby} className="floating-button btn-danger">
+        <button onClick={handleDisbandLobby} className="floating-button btn-danger">
           <Settings size={24} />
         </button>
 
@@ -635,7 +587,7 @@ function App() {
   if (view === 'host_reveal') {
     return renderWithNotifications(
       <div className="host-fullscreen">
-        <button onClick={disbandLobby} className="floating-button btn-danger">
+        <button onClick={handleDisbandLobby} className="floating-button btn-danger">
           <Settings size={24} />
         </button>
 
@@ -803,7 +755,7 @@ function App() {
           Waiting for host to start the game...
         </p>
 
-        <button onClick={leaveLobby} className="btn-danger">
+        <button onClick={handleLeaveLobby} className="btn-danger">
           <X size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
           Leave Lobby
         </button>
@@ -841,7 +793,7 @@ function App() {
               {myScore}
             </div>
             <button
-              onClick={leaveLobby}
+              onClick={handleLeaveLobby}
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -882,7 +834,7 @@ function App() {
             {currentAnswers.map((answer, idx) => (
               <button
                 key={idx}
-                onClick={() => submitAnswer(idx)}
+                onClick={() => handleSubmitAnswer(idx)}
                 disabled={selectedAnswer !== null}
                 className={selectedAnswer === idx ? 'selected' : ''}
               >
@@ -918,7 +870,7 @@ function App() {
               {myScore}
             </div>
             <button
-              onClick={leaveLobby}
+              onClick={handleLeaveLobby}
               style={{
                 background: 'transparent',
                 border: 'none',

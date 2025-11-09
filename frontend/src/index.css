@@ -1,68 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  /* Modern color palette */
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #818cf8;
-  --secondary: #ec4899;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --gold: #fbbf24;
-
-  /* Neutrals */
-  --bg-dark: #0f172a;
-  --bg-card: #1e293b;
-  --bg-light: #f8fafc;
-  --text-dark: #0f172a;
-  --text-light: #f8fafc;
-  --text-muted: #64748b;
-
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  --gradient-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-body {
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--gradient-bg);
-  min-height: 100vh;
-  height: 100vh;
-  color: var(--text-dark);
-  overflow: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#root {
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* Animated background */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background:
-    radial-gradient(circle at 20% 50%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
+/* Import global styles (CSS variables, animations, base styles) */
+@import './styles/globals.css';
 
 /* ==================== CONTAINERS ==================== */
 
@@ -94,17 +31,6 @@ body::before {
 
   .container.no-scroll {
     overflow-y: hidden;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -804,15 +730,6 @@ input::placeholder {
   font-size: 64px;
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* ==================== ERROR ==================== */
 
 .error {
@@ -825,12 +742,6 @@ input::placeholder {
   align-items: center;
   gap: 12px;
   animation: shake 0.5s;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
 }
 
 /* ==================== DIVIDER ==================== */
@@ -898,15 +809,6 @@ input::placeholder {
   animation: shimmer 3s infinite;
 }
 
-@keyframes shimmer {
-  0%, 100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(10%, 10%);
-  }
-}
-
 .winner-showcase h2 {
   color: white;
   font-size: 52px;
@@ -957,24 +859,6 @@ input::placeholder {
   .winner-showcase .points {
     font-size: 48px;
   }
-}
-
-/* ==================== UTILITIES ==================== */
-
-.text-center {
-  text-align: center;
-}
-
-.text-muted {
-  color: var(--text-muted);
-}
-
-.mb-large {
-  margin-bottom: 40px;
-}
-
-.mt-large {
-  margin-top: 40px;
 }
 
 /* ==================== RESPONSIVE ==================== */
@@ -1157,28 +1041,6 @@ input::placeholder {
   animation: slideUp 0.3s ease-out forwards;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
-}
-
 /* ==================== CONFIRMATION MODAL ==================== */
 
 .modal-overlay {
@@ -1240,15 +1102,6 @@ input::placeholder {
   margin: 0;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 @media (max-width: 768px) {
   .toast-container {
     width: calc(100% - 32px);
@@ -1281,21 +1134,3 @@ input::placeholder {
   }
 }
 
-/* ==================== SCROLL ==================== */
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.5);
-}
