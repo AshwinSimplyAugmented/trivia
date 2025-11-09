@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
+import {
+  Gamepad2, Users, Play, X, Settings, Clock, Check,
+  AlertCircle, Crown, Trophy, Zap, Target, Shield,
+  Loader2, Info, CheckCircle, XCircle, AlertTriangle
+} from 'lucide-react';
 
 // In dev, connect to backend on port 5000. In production, same origin.
 const isDev = window.location.hostname === 'localhost' && window.location.port === '3000';
@@ -54,8 +59,37 @@ function App() {
   const [finalScores, setFinalScores] = useState([]);
   const [winner, setWinner] = useState(null);
 
+  // Toast and Modal state
+  const [toasts, setToasts] = useState([]);
+  const [modal, setModal] = useState(null);
+
   const timerRef = useRef(null);
   const selectedAnswerRef = useRef(null);
+  const toastIdCounter = useRef(0);
+
+  // Toast functions
+  const showToast = (message, type = 'info') => {
+    const id = toastIdCounter.current++;
+    const toast = { id, message, type };
+    setToasts(prev => [...prev, toast]);
+
+    // Auto-dismiss after 4 seconds
+    setTimeout(() => {
+      setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t));
+      setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+      }, 300); // Match exit animation duration
+    }, 4000);
+  };
+
+  // Modal functions
+  const showConfirm = (title, message, onConfirm, onCancel) => {
+    setModal({ title, message, onConfirm, onCancel });
+  };
+
+  const closeModal = () => {
+    setModal(null);
+  };
 
   // Reconnection logic on mount
   useEffect(() => {
@@ -275,7 +309,7 @@ function App() {
     });
 
     socket.on('lobby_disbanded', (data) => {
-      alert(data.message);
+      showToast(data.message, 'warning');
       localStorage.removeItem('lobbyCode');
       localStorage.removeItem('role');
       localStorage.removeItem('displayName');
@@ -351,15 +385,23 @@ function App() {
   };
 
   const disbandLobby = () => {
-    if (window.confirm('Are you sure you want to disband this lobby? All players will be kicked out.')) {
-      socket.emit('disband_lobby', { code: lobbyCode });
-      localStorage.removeItem('lobbyCode');
-      localStorage.removeItem('role');
-      localStorage.removeItem('displayName');
-      setView('home');
-      setLobbyCode('');
-      setPlayers([]);
-    }
+    showConfirm(
+      'Disband Lobby?',
+      'Are you sure you want to disband this lobby? All players will be kicked out.',
+      () => {
+        socket.emit('disband_lobby', { code: lobbyCode });
+        localStorage.removeItem('lobbyCode');
+        localStorage.removeItem('role');
+        localStorage.removeItem('displayName');
+        setView('home');
+        setLobbyCode('');
+        setPlayers([]);
+        closeModal();
+      },
+      () => {
+        closeModal();
+      }
+    );
   };
 
   const returnToLobby = () => {
@@ -371,25 +413,88 @@ function App() {
     }
   };
 
-  // LOADING VIEW
-  if (isReconnecting) {
+  // TOAST NOTIFICATIONS COMPONENT
+  const ToastNotifications = () => {
+    if (toasts.length === 0) return null;
+
+    const getToastIcon = (type) => {
+      switch (type) {
+        case 'success': return <CheckCircle size={20} />;
+        case 'error': return <XCircle size={20} />;
+        case 'warning': return <AlertTriangle size={20} />;
+        default: return <Info size={20} />;
+      }
+    };
+
     return (
-      <div className="container">
-        <h1>🎮 Trivia Party</h1>
-        <p style={{ textAlign: 'center', color: '#999' }}>Reconnecting...</p>
+      <div className="toast-container">
+        {toasts.map(toast => (
+          <div
+            key={toast.id}
+            className={`toast ${toast.type} ${toast.exiting ? 'exit' : ''}`}
+          >
+            <div className="toast-icon">
+              {getToastIcon(toast.type)}
+            </div>
+            <div className="toast-message">{toast.message}</div>
+          </div>
+        ))}
       </div>
     );
-  }
+  };
+
+  // CONFIRMATION MODAL COMPONENT
+  const ConfirmationModal = () => {
+    if (!modal) return null;
+
+    return (
+      <div className="modal-overlay" onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          modal.onCancel?.();
+        }
+      }}>
+        <div className="modal">
+          <div className="modal-header">
+            <AlertTriangle size={28} style={{ color: '#ef4444' }} />
+            <h3 className="modal-title">{modal.title}</h3>
+          </div>
+          <p className="modal-message">{modal.message}</p>
+          <div className="modal-actions">
+            <button onClick={modal.onCancel} className="btn-secondary">
+              Cancel
+            </button>
+            <button onClick={modal.onConfirm} className="btn-danger">
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render toast and modal on every view
+  const renderWithNotifications = (content) => {
+    return (
+      <>
+        <ToastNotifications />
+        <ConfirmationModal />
+        {content}
+      </>
+    );
+  };
 
   // HOME VIEW
   if (view === 'home') {
-    return (
+    return renderWithNotifications(
       <div className="container">
-        <h1>🎮 Trivia Party</h1>
+        <h1><Gamepad2 size={48} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Trivia Party</h1>
 
-        <button onClick={createLobby}>Create Lobby (Host)</button>
+        <button onClick={createLobby}>
+          <Crown size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+          Create Lobby (Host)
+        </button>
 
-        <div style={{ margin: '30px 0', textAlign: 'center', color: '#999' }}>OR</div>
+        <div className="divider">OR</div>
 
         <input
           type="text"
@@ -407,46 +512,50 @@ function App() {
           maxLength={20}
         />
 
-        <button onClick={joinLobby}>Join Lobby</button>
+        <button onClick={joinLobby}>
+          <Users size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+          Join Lobby
+        </button>
 
-        {error && <div className="error">{error}</div>}
+        {error && (
+          <div className="error">
+            <AlertCircle size={20} />
+            {error}
+          </div>
+        )}
       </div>
     );
   }
 
   // HOST LOBBY VIEW
   if (view === 'host') {
-    return (
+    return renderWithNotifications(
       <div className="container">
-        <h1>Host Lobby</h1>
+        <h1><Crown size={40} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Host Lobby</h1>
 
         <div className="lobby-code">
-          <p style={{ margin: 0, fontSize: '18px' }}>Lobby Code</p>
-          <h2>{lobbyCode}</h2>
+          <div className="lobby-code-label">Lobby Code</div>
+          <div className="lobby-code-value">{lobbyCode}</div>
         </div>
 
         <div className="player-list">
-          <h3>Players ({players.length})</h3>
-          {players.length === 0 && <p style={{ color: '#999' }}>Waiting for players...</p>}
+          <h3><Users size={24} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> Players ({players.length})</h3>
+          {players.length === 0 && <p className="text-center text-muted">Waiting for players to join...</p>}
           {players.map((player) => (
             <div key={player.id} className="player">
+              <Users size={20} />
               {player.name}
             </div>
           ))}
         </div>
 
         <button onClick={startGame} disabled={players.length === 0}>
+          <Play size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
           Start Game
         </button>
 
-        <button
-          onClick={disbandLobby}
-          style={{
-            marginTop: '10px',
-            background: '#dc3545',
-            color: 'white'
-          }}
-        >
+        <button onClick={disbandLobby} className="btn-danger">
+          <X size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
           Disband Lobby
         </button>
       </div>
@@ -455,24 +564,24 @@ function App() {
 
   // HOST MODE SELECTION VIEW
   if (view === 'host_mode_select') {
-    return (
+    return renderWithNotifications(
       <div className="container">
-        <h1>Select Game Mode</h1>
+        <h1><Target size={40} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Select Game Mode</h1>
 
         <div className="game-modes">
           <div className="mode-card" onClick={() => selectGameMode('ffa')}>
-            <h2>⚡ Free For All</h2>
+            <h2><Zap size={28} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> Free For All</h2>
             <p>Every player for themselves! Answer fast to earn more points.</p>
           </div>
 
           <div className="mode-card disabled">
-            <h2>🤝 Teams (Coming Soon)</h2>
-            <p>Team up and compete together!</p>
+            <h2><Shield size={28} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> Teams</h2>
+            <p>Team up and compete together! (Coming Soon)</p>
           </div>
 
           <div className="mode-card disabled">
-            <h2>🏆 Survival (Coming Soon)</h2>
-            <p>Last player standing wins!</p>
+            <h2><Trophy size={28} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> Survival</h2>
+            <p>Last player standing wins! (Coming Soon)</p>
           </div>
         </div>
       </div>
@@ -481,130 +590,80 @@ function App() {
 
   // HOST QUESTION VIEW (TV)
   if (view === 'host_question') {
-    return (
-      <>
-        <button
-          onClick={disbandLobby}
-          className="floating-button"
-          style={{
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            background: '#dc3545',
-            color: 'white',
-            padding: '12px 20px',
-            fontSize: '14px',
-            borderRadius: '50px',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            zIndex: 1000
-          }}
-        >
-          ⚙️ End Game
+    return renderWithNotifications(
+      <div className="host-fullscreen">
+        <button onClick={disbandLobby} className="floating-button btn-danger">
+          <Settings size={24} />
         </button>
-        <div className="container host-view">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2>Question {questionIndex + 1}/{totalQuestions}</h2>
-            <div className="timer" style={{ fontSize: '32px', fontWeight: 'bold', color: timeRemaining <= 5 ? '#dc3545' : '#667eea' }}>
+
+        <div className="content-wrapper">
+          <div className="question-header">
+            <div className="question-counter">
+              <Target size={24} />
+              Question {questionIndex + 1}/{totalQuestions}
+            </div>
+            <div className={`timer-display ${timeRemaining <= 5 ? 'urgent' : ''}`}>
+              <Clock size={48} />
               {timeRemaining}s
             </div>
           </div>
 
-        <div className="question-card">
-          <h1 style={{ fontSize: '36px', marginBottom: '40px' }}>{currentQuestion}</h1>
+          <div className="question-card">
+            <div className="question-text">{currentQuestion}</div>
 
-          <div style={{ marginTop: '30px' }}>
-            {currentAnswers.map((answer, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: '#f0f0f0',
-                  padding: '15px',
-                  margin: '10px 0',
-                  borderRadius: '8px',
-                  fontSize: '20px'
-                }}
-              >
-                <span style={{ fontWeight: 'bold', color: '#667eea' }}>{String.fromCharCode(65 + idx)}.</span> {answer}
-              </div>
-            ))}
+            <div>
+              {currentAnswers.map((answer, idx) => (
+                <div key={idx} className="answer-option">
+                  <div className="answer-label">
+                    <div className="answer-letter">{String.fromCharCode(65 + idx)}</div>
+                    <span>{answer}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <p style={{ textAlign: 'center', color: '#999', marginTop: '20px' }}>
-          Players are answering...
-        </p>
+          <p className="text-center text-muted" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '18px', marginTop: '32px' }}>
+            Players are answering...
+          </p>
+        </div>
       </div>
-      </>
     );
   }
 
   // HOST REVEAL VIEW (TV)
   if (view === 'host_reveal') {
-    return (
-      <>
-        <button
-          onClick={disbandLobby}
-          className="floating-button"
-          style={{
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            background: '#dc3545',
-            color: 'white',
-            padding: '12px 20px',
-            fontSize: '14px',
-            borderRadius: '50px',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            zIndex: 1000
-          }}
-        >
-          ⚙️ End Game
+    return renderWithNotifications(
+      <div className="host-fullscreen">
+        <button onClick={disbandLobby} className="floating-button btn-danger">
+          <Settings size={24} />
         </button>
-        <div className="container host-view">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2>Question {questionIndex + 1}/{totalQuestions} - Results</h2>
+
+        <div className="content-wrapper">
+          <div className="question-header">
+            <div className="question-counter">
+              <Check size={24} />
+              Question {questionIndex + 1}/{totalQuestions} - Results
+            </div>
           </div>
 
           <div className="question-card">
-            <h2 style={{ marginBottom: '30px' }}>{currentQuestion}</h2>
+            <div className="question-text" style={{ fontSize: '28px', marginBottom: '32px' }}>{currentQuestion}</div>
 
             {currentAnswers && answerStats.map((stat, idx) => (
               <div
                 key={idx}
-                className="answer-option"
-                style={{
-                  background: idx === correctAnswer ? '#28a745' : '#f0f0f0',
-                  color: idx === correctAnswer ? 'white' : '#333',
-                  padding: '15px',
-                  margin: '10px 0',
-                  borderRadius: '8px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}
+                className={`answer-option ${idx === correctAnswer ? 'correct' : 'incorrect'}`}
               >
-                <span style={{ fontWeight: 'bold' }}>{String.fromCharCode(65 + idx)}. {currentAnswers[idx]}</span>
-                <div style={{ display: 'flex', gap: '5px' }}>
+                <div className="answer-label">
+                  <div className="answer-letter">{String.fromCharCode(65 + idx)}</div>
+                  <span>{currentAnswers[idx]}</span>
+                </div>
+                <div className="player-badges">
                   {stat.players.map((player, pIdx) => (
                     <div
                       key={pIdx}
-                      className="player-badge"
-                      style={{
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '50%',
-                        background: idx === correctAnswer ? '#fff' : '#667eea',
-                        color: idx === correctAnswer ? '#28a745' : '#fff',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 'bold',
-                        fontSize: '14px'
-                      }}
+                      className={`player-badge ${idx === correctAnswer ? 'correct-answer' : ''}`}
                     >
                       {player.initial}
                     </div>
@@ -614,87 +673,138 @@ function App() {
             ))}
           </div>
         </div>
-      </>
+      </div>
     );
   }
 
   // HOST RESULTS VIEW
   if (view === 'host_results') {
-    return (
-      <div className="container">
-        <h1>🏆 Final Results!</h1>
+    const playAgain = () => {
+      setView('host_mode_select');
+      // Reset game state
+      setCurrentQuestion(null);
+      setCurrentAnswers([]);
+      setQuestionIndex(0);
+      setTotalQuestions(0);
+      setSelectedAnswer(null);
+      setCorrectAnswer(null);
+      setAnswerStats([]);
+      setPointsEarned(0);
+      setFinalScores([]);
+      setWinner(null);
+    };
 
-        {winner && (
-          <div style={{ textAlign: 'center', margin: '30px 0' }}>
-            <h2 style={{ color: '#ffd700', fontSize: '48px' }}>Winner: {winner.name}</h2>
-            <p style={{ fontSize: '24px' }}>{winner.score} points</p>
+    return renderWithNotifications(
+      <div className="host-fullscreen">
+        <div className="content-wrapper">
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '20px',
+            padding: '20px 40px',
+            marginBottom: '24px',
+            border: '2px solid rgba(255, 255, 255, 0.3)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+          }}>
+            <h1 style={{
+              color: 'white',
+              textAlign: 'center',
+              margin: '0',
+              fontSize: '56px',
+              fontWeight: '900',
+              letterSpacing: '-1px',
+              background: 'none',
+              WebkitBackgroundClip: 'unset',
+              WebkitTextFillColor: 'white',
+              backgroundClip: 'unset'
+            }}>
+              <Trophy size={56} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />
+              Final Results!
+            </h1>
           </div>
-        )}
 
-        <div className="leaderboard">
-          {finalScores.map((player, idx) => (
-            <div
-              key={idx}
-              className="leaderboard-item"
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '15px',
-                margin: '10px 0',
-                background: idx === 0 ? '#ffd700' : '#f0f0f0',
-                borderRadius: '8px',
-                fontWeight: idx === 0 ? 'bold' : 'normal'
-              }}
-            >
-              <span>#{idx + 1} {player.name}</span>
-              <span>{player.score} pts</span>
+          <div className="host-results-grid">
+            {winner && (
+              <div className="winner-showcase">
+                <Crown size={100} style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
+                <h2 style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>{winner.name}</h2>
+                <div className="points" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>{winner.score} pts</div>
+                <p style={{ fontSize: '20px', opacity: 1, marginTop: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '2px' }}>Champion!</p>
+              </div>
+            )}
+
+            <div className="leaderboard-container">
+              <h3 style={{ fontSize: '22px', fontWeight: '700' }}>
+                <Trophy size={24} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+                Full Leaderboard
+              </h3>
+              <div className="leaderboard" style={{ maxHeight: 'calc(100vh - 400px)', overflowY: 'auto' }}>
+                {finalScores.map((player, idx) => (
+                  <div
+                    key={idx}
+                    className={`leaderboard-item ${idx === 0 ? 'winner' : ''}`}
+                  >
+                    <div className="leaderboard-rank">
+                      {idx === 0 && <Crown size={20} />}
+                      #{idx + 1} {player.name}
+                    </div>
+                    <div className="leaderboard-score">{player.score} pts</div>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
+          </div>
 
-        <button onClick={returnToLobby} style={{ marginTop: '20px' }}>Return to Lobby</button>
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '24px', flexWrap: 'wrap' }}>
+            <button onClick={playAgain} className="btn-success" style={{ maxWidth: '250px', minWidth: '200px', margin: '0' }}>
+              <Play size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+              Play Again
+            </button>
+            <button onClick={returnToLobby} className="btn-secondary" style={{ maxWidth: '250px', minWidth: '200px', margin: '0' }}>
+              <Users size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+              Return to Lobby
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   // PLAYER LOBBY VIEW
   if (view === 'player') {
-    return (
+    return renderWithNotifications(
       <div className="container">
-        <h1>Waiting Room</h1>
+        <h1><Users size={40} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Waiting Room</h1>
 
-        <div style={{ textAlign: 'center', margin: '20px 0' }}>
-          <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#667eea' }}>
+        <div className="text-center" style={{ margin: '32px 0' }}>
+          <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#6366f1', marginBottom: '8px' }}>
             {displayName}
           </p>
-          <p style={{ color: '#999' }}>Lobby: {lobbyCode}</p>
+          <p className="text-muted">Lobby: <strong style={{ color: '#6366f1' }}>{lobbyCode}</strong></p>
         </div>
 
         <div className="player-list">
-          <h3>Players ({players.length})</h3>
+          <h3><Users size={24} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> Players ({players.length})</h3>
           {players.map((player) => (
             <div
               key={player.id}
-              className="player"
-              style={player.id === playerId ? { background: '#667eea', color: 'white' } : {}}
+              className={`player ${player.id === playerId ? 'current-player' : ''}`}
             >
+              <Users size={20} />
               {player.name} {player.id === playerId && '(You)'}
             </div>
           ))}
         </div>
 
-        <p style={{ textAlign: 'center', color: '#999', marginTop: '20px' }}>
-          Waiting for host to start...
+        <div className="loading-spinner" style={{ padding: '30px 0' }}>
+          <Loader2 size={40} className="spinner-icon" style={{ color: '#6366f1' }} />
+        </div>
+        <p className="text-center text-muted">
+          Waiting for host to start the game...
         </p>
 
-        <button
-          onClick={leaveLobby}
-          style={{
-            marginTop: '10px',
-            background: '#dc3545',
-            color: 'white'
-          }}
-        >
+        <button onClick={leaveLobby} className="btn-danger">
+          <X size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
           Leave Lobby
         </button>
       </div>
@@ -703,14 +813,14 @@ function App() {
 
   // PLAYER WAITING VIEW (Host selecting mode)
   if (view === 'player_waiting') {
-    return (
+    return renderWithNotifications(
       <div className="container">
-        <div style={{ textAlign: 'center', padding: '50px 0' }}>
-          <div className="loading-spinner" style={{ fontSize: '64px', marginBottom: '20px' }}>
-            🎮
+        <div className="text-center" style={{ padding: '60px 0' }}>
+          <div className="loading-spinner">
+            <Gamepad2 size={80} className="spinner-icon" style={{ color: '#6366f1' }} />
           </div>
-          <h2>Host is selecting a game...</h2>
-          <p style={{ color: '#999' }}>Get ready!</p>
+          <h2 style={{ fontSize: '32px', marginTop: '32px' }}>Host is selecting a game mode...</h2>
+          <p className="text-muted" style={{ fontSize: '18px', marginTop: '16px' }}>Get ready!</p>
         </div>
       </div>
     );
@@ -718,143 +828,146 @@ function App() {
 
   // PLAYER QUESTION VIEW (Phone)
   if (view === 'player_question') {
-    return (
-      <>
-        <button
-          onClick={leaveLobby}
-          className="floating-button"
-          style={{
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            background: '#dc3545',
-            color: 'white',
-            width: '40px',
-            height: '40px',
-            fontSize: '20px',
-            borderRadius: '50%',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 0
-          }}
-        >
-          ✕
-        </button>
-        <div className="container player-view">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontWeight: 'bold' }}>{displayName}</span>
-            <span style={{ fontWeight: 'bold', color: '#667eea' }}>🏆 {myScore}</span>
+    return renderWithNotifications(
+      <div className="container no-scroll">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', fontSize: '14px' }}>
+            <Users size={18} style={{ color: '#6366f1' }} />
+            {displayName}
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: '#6366f1', fontSize: '14px' }}>
+              <Trophy size={18} />
+              {myScore}
+            </div>
+            <button
+              onClick={leaveLobby}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '4px',
+                cursor: 'pointer',
+                color: '#64748b',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '4px',
+                transition: 'all 0.2s',
+                width: 'auto',
+                margin: 0
+              }}
+              onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
+              onMouseLeave={(e) => e.target.style.background = 'transparent'}
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
 
-          <div style={{ textAlign: 'center', margin: '20px 0' }}>
-            <div className="timer" style={{ fontSize: '48px', fontWeight: 'bold', color: timeRemaining <= 5 ? '#dc3545' : '#667eea' }}>
+          <div className="text-center" style={{ margin: '20px 0' }}>
+            <div className={`timer-display ${timeRemaining <= 5 ? 'urgent' : ''}`} style={{ fontSize: '48px', justifyContent: 'center' }}>
+              <Clock size={40} />
               {timeRemaining}s
             </div>
-            <p style={{ fontSize: '12px', color: '#999' }}>Question {questionIndex + 1}/{totalQuestions}</p>
+            <p className="text-muted" style={{ fontSize: '12px', marginTop: '4px' }}>
+              Question {questionIndex + 1}/{totalQuestions}
+            </p>
           </div>
 
-          <h3 style={{ textAlign: 'center', margin: '20px 0' }}>{currentQuestion}</h3>
+          <h3 className="text-center" style={{ margin: '20px 0', fontSize: '18px', lineHeight: '1.3', flex: '0 0 auto' }}>
+            {currentQuestion}
+          </h3>
 
-          <div className="answer-buttons">
+          <div className="answer-buttons" style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             {currentAnswers.map((answer, idx) => (
               <button
                 key={idx}
                 onClick={() => submitAnswer(idx)}
                 disabled={selectedAnswer !== null}
-                style={{
-                  padding: '20px',
-                  margin: '10px 0',
-                  fontSize: '18px',
-                  fontWeight: 'bold',
-                  background: selectedAnswer === idx ? '#667eea' : '#f0f0f0',
-                  color: selectedAnswer === idx ? 'white' : '#333',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: selectedAnswer !== null ? 'not-allowed' : 'pointer',
-                  opacity: selectedAnswer !== null && selectedAnswer !== idx ? 0.5 : 1,
-                  textAlign: 'left'
-                }}
+                className={selectedAnswer === idx ? 'selected' : ''}
               >
-                <span style={{ color: selectedAnswer === idx ? 'white' : '#667eea', marginRight: '10px' }}>
-                  {String.fromCharCode(65 + idx)}.
-                </span>
-                {answer}
+                <div className="answer-letter">{String.fromCharCode(65 + idx)}</div>
+                <span>{answer}</span>
               </button>
             ))}
           </div>
 
           {selectedAnswer !== null && (
-            <p style={{ textAlign: 'center', color: '#667eea', marginTop: '20px' }}>
-              Answer locked in! ✓
+            <p className="text-center" style={{ color: '#10b981', marginTop: '16px', fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flex: '0 0 auto' }}>
+              <Check size={20} />
+              Answer locked in!
             </p>
           )}
         </div>
-      </>
     );
   }
 
   // PLAYER REVEAL VIEW (Phone)
   if (view === 'player_reveal') {
     const wasCorrect = selectedAnswer === correctAnswer;
-    return (
-      <>
-        <button
-          onClick={leaveLobby}
-          className="floating-button"
-          style={{
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            background: '#dc3545',
-            color: 'white',
-            width: '40px',
-            height: '40px',
-            fontSize: '20px',
-            borderRadius: '50%',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 0
-          }}
-        >
-          ✕
-        </button>
-        <div className="container player-view">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-            <span style={{ fontWeight: 'bold' }}>{displayName}</span>
-            <span style={{ fontWeight: 'bold', color: '#667eea' }}>🏆 {myScore}</span>
+    return renderWithNotifications(
+      <div className="container no-scroll">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', fontSize: '14px' }}>
+            <Users size={18} style={{ color: '#6366f1' }} />
+            {displayName}
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: '#6366f1', fontSize: '14px' }}>
+              <Trophy size={18} />
+              {myScore}
+            </div>
+            <button
+              onClick={leaveLobby}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: '4px',
+                cursor: 'pointer',
+                color: '#64748b',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '4px',
+                transition: 'all 0.2s',
+                width: 'auto',
+                margin: 0
+              }}
+              onMouseEnter={(e) => e.target.style.background = '#f1f5f9'}
+              onMouseLeave={(e) => e.target.style.background = 'transparent'}
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
 
-          <div style={{ textAlign: 'center', margin: '40px 0' }}>
+          <div className="text-center" style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             {wasCorrect ? (
               <>
-                <div style={{ fontSize: '64px', marginBottom: '10px' }}>✅</div>
-                <h2 style={{ color: '#28a745' }}>Correct!</h2>
-                <p style={{ fontSize: '36px', fontWeight: 'bold', color: '#667eea' }}>
-                  +{pointsEarned} points
-                </p>
+                <div className="result-icon" style={{ margin: '0' }}>
+                  <Check size={100} style={{ color: '#10b981' }} />
+                </div>
+                <h2 className="result-message correct" style={{ margin: '16px 0' }}>Correct!</h2>
+                <p className="points-earned" style={{ margin: '8px 0' }}>+{pointsEarned} pts</p>
               </>
             ) : (
               <>
-                <div style={{ fontSize: '64px', marginBottom: '10px' }}>❌</div>
-                <h2 style={{ color: '#dc3545' }}>Wrong</h2>
-                <p style={{ color: '#999' }}>Better luck next time!</p>
+                <div className="result-icon" style={{ margin: '0' }}>
+                  <X size={100} style={{ color: '#ef4444' }} />
+                </div>
+                <h2 className="result-message incorrect" style={{ margin: '16px 0' }}>Wrong</h2>
+                <p className="text-muted" style={{ fontSize: '16px' }}>Better luck next time!</p>
               </>
             )}
           </div>
 
-          <p style={{ textAlign: 'center', color: '#999' }}>Next question coming up...</p>
+          <div style={{ flex: '0 0 auto' }}>
+            <div className="loading-spinner" style={{ padding: '12px 0' }}>
+              <Loader2 size={28} className="spinner-icon" style={{ color: '#6366f1' }} />
+            </div>
+            <p className="text-center text-muted" style={{ fontSize: '14px' }}>Next question coming up...</p>
+          </div>
         </div>
-      </>
     );
   }
 
@@ -863,45 +976,50 @@ function App() {
     const myRank = finalScores.findIndex(p => p.session_id === playerId) + 1;
     const isWinner = myRank === 1;
 
-    return (
+    return renderWithNotifications(
       <div className="container">
-        {isWinner ? (
-          <>
-            <h1 style={{ fontSize: '64px', textAlign: 'center' }}>🏆</h1>
-            <h2 style={{ textAlign: 'center', color: '#ffd700' }}>You Won!</h2>
-          </>
-        ) : (
-          <h1 style={{ textAlign: 'center' }}>Game Over!</h1>
-        )}
+        <div style={{ flex: '0 0 auto' }}>
+          {isWinner ? (
+            <div className="text-center">
+              <div className="result-icon" style={{ margin: '20px 0 12px' }}>
+                <Crown size={80} style={{ color: '#fbbf24' }} />
+              </div>
+              <h1 style={{ fontSize: '36px', color: '#fbbf24', fontWeight: '900', margin: '12px 0' }}>You Won!</h1>
+            </div>
+          ) : (
+            <div className="text-center">
+              <div className="result-icon" style={{ margin: '20px 0 12px' }}>
+                <Trophy size={80} style={{ color: '#6366f1' }} />
+              </div>
+              <h1 style={{ fontSize: '32px', margin: '12px 0' }}>Game Over!</h1>
+            </div>
+          )}
 
-        <div style={{ textAlign: 'center', margin: '30px 0' }}>
-          <p style={{ fontSize: '18px', color: '#999' }}>You placed #{myRank}</p>
-          <p style={{ fontSize: '36px', fontWeight: 'bold', color: '#667eea' }}>{myScore} points</p>
+          <div className="text-center" style={{ margin: '20px 0' }}>
+            <p className="text-muted" style={{ fontSize: '16px' }}>You placed <strong style={{ color: '#6366f1' }}>#{myRank}</strong></p>
+            <p className="points-earned" style={{ fontSize: '36px', margin: '8px 0' }}>{myScore} pts</p>
+          </div>
         </div>
 
-        <div className="leaderboard">
+        <div className="leaderboard" style={{ flex: '1 1 auto', marginBottom: '16px' }}>
           {finalScores.map((player, idx) => (
             <div
               key={idx}
-              className="leaderboard-item"
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '15px',
-                margin: '10px 0',
-                background: player.session_id === playerId ? '#667eea' : '#f0f0f0',
-                color: player.session_id === playerId ? 'white' : '#333',
-                borderRadius: '8px',
-                fontWeight: idx === 0 ? 'bold' : 'normal'
-              }}
+              className={`leaderboard-item ${player.session_id === playerId ? 'current-player' : ''} ${idx === 0 ? 'winner' : ''}`}
             >
-              <span>#{idx + 1} {player.name}</span>
-              <span>{player.score} pts</span>
+              <div className="leaderboard-rank">
+                {idx === 0 && <Crown size={18} />}
+                #{idx + 1} {player.name}
+              </div>
+              <div className="leaderboard-score">{player.score} pts</div>
             </div>
           ))}
         </div>
 
-        <button onClick={returnToLobby} style={{ marginTop: '20px' }}>Return to Lobby</button>
+        <button onClick={returnToLobby} className="btn-secondary" style={{ flex: '0 0 auto' }}>
+          <Users size={18} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+          Return to Lobby
+        </button>
       </div>
     );
   }
