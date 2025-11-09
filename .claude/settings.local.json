@@ -11,7 +11,13 @@
       "Bash(npm install:*)",
       "Bash(sqlite3:*)",
       "Bash(python app.py:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(dir:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd /c \"taskkill /PID 15496 /F\")",
+      "Bash(powershell -Command \"Stop-Process -Id 15496 -Force\")"
     ],
     "deny": [],
     "ask": []

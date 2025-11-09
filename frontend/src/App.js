@@ -21,6 +21,7 @@ import {
   reconnectToLobby
 } from './api/socket';
 import { getSessionId } from './utils/helpers';
+import AudioManager from './services/AudioManager';
 
 function App() {
   // View states: home, host, host_mode_select, host_question, host_reveal, host_results
@@ -59,6 +60,7 @@ function App() {
   const timerRef = useRef(null);
   const selectedAnswerRef = useRef(null);
   const toastIdCounter = useRef(0);
+  const audioInitialized = useRef(false);
 
   // Toast functions
   const showToast = (message, type = 'info') => {
@@ -132,6 +134,48 @@ function App() {
 
     attemptReconnect();
   }, []);
+
+  // Initialize AudioManager on mount (only once)
+  useEffect(() => {
+    if (!audioInitialized.current) {
+      console.log('[App] Initializing AudioManager');
+      AudioManager.init();
+      audioInitialized.current = true;
+    }
+    // No cleanup - AudioManager is a singleton that should persist
+    // throughout the app lifecycle. Cleanup only happens on page unload.
+  }, []);
+
+  // Handle audio based on view changes (Host only)
+  useEffect(() => {
+    const role = localStorage.getItem('role');
+
+    // Only host plays background music
+    if (role !== 'host') {
+      return;
+    }
+
+    // Unlock audio on first interaction (mobile support)
+    AudioManager.unlockAudio();
+
+    if (view === 'host' || view === 'host_mode_select') {
+      // Play lobby music
+      console.log('[App] Playing lobby music');
+      AudioManager.playBGM('lobby');
+    } else if (view === 'host_question' || view === 'host_reveal') {
+      // Cross-fade to gameplay music
+      console.log('[App] Cross-fading to gameplay music');
+      AudioManager.playBGM('gameplay');
+    } else if (view === 'host_results') {
+      // Keep gameplay music for results
+      // You could add a separate results track here if you want
+      console.log('[App] Keeping gameplay music for results');
+    } else if (view === 'home') {
+      // Stop all music when returning to home
+      console.log('[App] Stopping all music');
+      AudioManager.stopBGM();
+    }
+  }, [view]);
 
   // Initialize socket listeners
   useEffect(() => {
@@ -308,10 +352,14 @@ function App() {
   };
 
   const handleCreateLobby = () => {
+    // Unlock audio on first interaction (mobile support)
+    AudioManager.unlockAudio();
     createLobby(sessionId);
   };
 
   const handleJoinLobby = () => {
+    // Unlock audio on first interaction (mobile support)
+    AudioManager.unlockAudio();
     if (!joinCode || !displayName) {
       setError('Please enter lobby code and name');
       return;
@@ -342,6 +390,7 @@ function App() {
       'Are you sure you want to disband this lobby? All players will be kicked out.',
       () => {
         disbandLobby(lobbyCode);
+        AudioManager.stopBGM(); // Stop music when disbanding
         localStorage.removeItem('lobbyCode');
         localStorage.removeItem('role');
         localStorage.removeItem('displayName');
