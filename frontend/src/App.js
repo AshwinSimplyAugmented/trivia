@@ -410,6 +410,9 @@ function App() {
 
   const handleSubmitAnswer = (answerIndex) => {
     if (selectedAnswer !== null) return; // Already answered
+    // Set selected answer immediately for instant UI feedback
+    setSelectedAnswer(answerIndex);
+    selectedAnswerRef.current = answerIndex;
     submitAnswer(questionIndex, answerIndex);
   };
 
@@ -520,9 +523,17 @@ function App() {
   // LOADING SCREEN - Show while theme is loading
   if (isLoadingTheme) {
     return (
-      <div className="loading-screen">
-        <Loader2 size={60} className="spinner-icon" />
-        <p style={{ marginTop: '24px', fontSize: '18px', color: 'rgba(255,255,255,0.8)' }}>
+      <div style={{
+        width: '100vw',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        background: '#ffffff'
+      }}>
+        <Loader2 size={60} style={{ color: '#000000', animation: 'spin 1s linear infinite' }} />
+        <p style={{ marginTop: '24px', fontSize: '18px', color: '#000000', fontWeight: '500' }}>
           Loading theme...
         </p>
       </div>
@@ -533,7 +544,7 @@ function App() {
   if (view === 'home') {
     return renderWithNotifications(
       <div className="container">
-        <h1><Gamepad2 size={48} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Trivia Party</h1>
+        <h1><Gamepad2 size={48} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px', color: 'var(--primary)' }} />Trivia <span style={{ color: 'var(--secondary)' }}>Party</span></h1>
 
         <button onClick={handleCreateLobby}>
           <Crown size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
@@ -577,7 +588,7 @@ function App() {
   if (view === 'host') {
     return renderWithNotifications(
       <div className="container">
-        <h1><Crown size={40} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Host Lobby</h1>
+        <h1><Crown size={40} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px', color: 'var(--primary)' }} />Host Lobby</h1>
 
         <div className="lobby-code">
           <div className="lobby-code-label">Lobby Code</div>
@@ -612,7 +623,7 @@ function App() {
   if (view === 'host_mode_select') {
     return renderWithNotifications(
       <div className="container">
-        <h1><Target size={40} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Select Game Mode</h1>
+        <h1><Target size={40} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px', color: 'var(--primary)' }} />Select Game Mode</h1>
 
         <div className="game-modes">
           <div className="mode-card" onClick={() => handleSelectGameMode('ffa')}>
@@ -725,21 +736,6 @@ function App() {
 
   // HOST RESULTS VIEW
   if (view === 'host_results') {
-    const playAgain = () => {
-      setView('host_mode_select');
-      // Reset game state
-      setCurrentQuestion(null);
-      setCurrentAnswers([]);
-      setQuestionIndex(0);
-      setTotalQuestions(0);
-      setSelectedAnswer(null);
-      setCorrectAnswer(null);
-      setAnswerStats([]);
-      setPointsEarned(0);
-      setFinalScores([]);
-      setWinner(null);
-    };
-
     return renderWithNotifications(
       <div className="host-fullscreen">
         <div className="content-wrapper">
@@ -775,7 +771,15 @@ function App() {
                 <Crown size={100} style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
                 <h2 style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>{winner.name}</h2>
                 <div className="points" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>{winner.score} pts</div>
-                <p style={{ fontSize: '20px', opacity: 1, marginTop: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '2px' }}>Champion!</p>
+                {(() => {
+                  const topScore = finalScores.length > 0 ? finalScores[0].score : 0;
+                  const winnersCount = finalScores.filter(p => p.score === topScore).length;
+                  return winnersCount > 1 ? (
+                    <p style={{ fontSize: '20px', opacity: 1, marginTop: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '2px' }}>Co-Champion!</p>
+                  ) : (
+                    <p style={{ fontSize: '20px', opacity: 1, marginTop: '12px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '2px' }}>Champion!</p>
+                  );
+                })()}
               </div>
             )}
 
@@ -785,27 +789,27 @@ function App() {
                 Full Leaderboard
               </h3>
               <div className="leaderboard" style={{ maxHeight: 'calc(100vh - 400px)', overflowY: 'auto' }}>
-                {finalScores.map((player, idx) => (
-                  <div
-                    key={idx}
-                    className={`leaderboard-item ${idx === 0 ? 'winner' : ''}`}
-                  >
-                    <div className="leaderboard-rank">
-                      {idx === 0 && <Crown size={20} />}
-                      #{idx + 1} {player.name}
+                {finalScores.map((player, idx) => {
+                  const topScore = finalScores.length > 0 ? finalScores[0].score : 0;
+                  const isTopScore = player.score === topScore;
+                  return (
+                    <div
+                      key={idx}
+                      className={`leaderboard-item ${isTopScore ? 'winner' : ''}`}
+                    >
+                      <div className="leaderboard-rank">
+                        {isTopScore && <Crown size={20} />}
+                        #{idx + 1} {player.name}
+                      </div>
+                      <div className="leaderboard-score">{player.score} pts</div>
                     </div>
-                    <div className="leaderboard-score">{player.score} pts</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '24px', flexWrap: 'wrap' }}>
-            <button onClick={playAgain} className="btn-success" style={{ maxWidth: '250px', minWidth: '200px', margin: '0' }}>
-              <Play size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
-              Play Again
-            </button>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}>
             <button onClick={returnToLobby} className="btn-secondary" style={{ maxWidth: '250px', minWidth: '200px', margin: '0' }}>
               <Users size={20} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
               Return to Lobby
@@ -820,13 +824,13 @@ function App() {
   if (view === 'player') {
     return renderWithNotifications(
       <div className="container">
-        <h1><Users size={40} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px' }} />Waiting Room</h1>
+        <h1><Users size={40} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '12px', color: 'var(--primary)' }} />Waiting Room</h1>
 
         <div className="text-center" style={{ margin: '32px 0' }}>
-          <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#6366f1', marginBottom: '8px' }}>
+          <p style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--secondary)', marginBottom: '8px' }}>
             {displayName}
           </p>
-          <p className="text-muted">Lobby: <strong style={{ color: '#6366f1' }}>{lobbyCode}</strong></p>
+          <p className="text-muted">Lobby: <strong style={{ color: 'var(--secondary)' }}>{lobbyCode}</strong></p>
         </div>
 
         <div className="player-list">
@@ -843,7 +847,7 @@ function App() {
         </div>
 
         <div className="loading-spinner" style={{ padding: '30px 0' }}>
-          <Loader2 size={40} className="spinner-icon" style={{ color: '#6366f1' }} />
+          <Loader2 size={40} className="spinner-icon" style={{ color: 'var(--secondary)' }} />
         </div>
         <p className="text-center text-muted">
           Waiting for host to start the game...
@@ -863,7 +867,7 @@ function App() {
       <div className="container">
         <div className="text-center" style={{ padding: '60px 0' }}>
           <div className="loading-spinner">
-            <Gamepad2 size={80} className="spinner-icon" style={{ color: '#6366f1' }} />
+            <Gamepad2 size={80} className="spinner-icon" style={{ color: 'var(--primary)' }} />
           </div>
           <h2 style={{ fontSize: '32px', marginTop: '32px' }}>Host is selecting a game mode...</h2>
           <p className="text-muted" style={{ fontSize: '18px', marginTop: '16px' }}>Get ready!</p>
@@ -878,11 +882,11 @@ function App() {
       <div className="container no-scroll">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', fontSize: '14px' }}>
-            <Users size={18} style={{ color: '#6366f1' }} />
+            <Users size={18} style={{ color: 'var(--primary)' }} />
             {displayName}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: '#6366f1', fontSize: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: 'var(--secondary)', fontSize: '14px' }}>
               <Trophy size={18} />
               {myScore}
             </div>
@@ -955,11 +959,11 @@ function App() {
       <div className="container no-scroll">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600', fontSize: '14px' }}>
-            <Users size={18} style={{ color: '#6366f1' }} />
+            <Users size={18} style={{ color: 'var(--primary)' }} />
             {displayName}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: '#6366f1', fontSize: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700', color: 'var(--secondary)', fontSize: '14px' }}>
               <Trophy size={18} />
               {myScore}
             </div>
@@ -994,7 +998,7 @@ function App() {
                   <Check size={100} style={{ color: '#10b981' }} />
                 </div>
                 <h2 className="result-message correct" style={{ margin: '16px 0' }}>Correct!</h2>
-                <p className="points-earned" style={{ margin: '8px 0' }}>+{pointsEarned} pts</p>
+                <p className="points-earned" style={{ margin: '8px 0', color: 'var(--success)', background: 'none', WebkitTextFillColor: 'var(--success)' }}>+{pointsEarned} pts</p>
               </>
             ) : (
               <>
@@ -1009,7 +1013,7 @@ function App() {
 
           <div style={{ flex: '0 0 auto' }}>
             <div className="loading-spinner" style={{ padding: '12px 0' }}>
-              <Loader2 size={28} className="spinner-icon" style={{ color: '#6366f1' }} />
+              <Loader2 size={28} className="spinner-icon" style={{ color: 'var(--secondary)' }} />
             </div>
             <p className="text-center text-muted" style={{ fontSize: '14px' }}>Next question coming up...</p>
           </div>
@@ -1020,7 +1024,10 @@ function App() {
   // PLAYER RESULTS VIEW
   if (view === 'player_results') {
     const myRank = finalScores.findIndex(p => p.session_id === playerId) + 1;
-    const isWinner = myRank === 1;
+    // Check if player is a winner (tied for first place)
+    const topScore = finalScores.length > 0 ? finalScores[0].score : 0;
+    const myPlayer = finalScores.find(p => p.session_id === playerId);
+    const isWinner = myPlayer && myPlayer.score === topScore;
 
     return renderWithNotifications(
       <div className="container">
@@ -1028,38 +1035,41 @@ function App() {
           {isWinner ? (
             <div className="text-center">
               <div className="result-icon" style={{ margin: '20px 0 12px' }}>
-                <Crown size={80} style={{ color: '#fbbf24' }} />
+                <Crown size={80} style={{ color: '#10b981' }} />
               </div>
-              <h1 style={{ fontSize: '36px', color: '#fbbf24', fontWeight: '900', margin: '12px 0' }}>You Won!</h1>
+              <h1 style={{ fontSize: '36px', color: '#10b981', fontWeight: '900', margin: '12px 0', background: 'none', WebkitTextFillColor: '#10b981', backgroundClip: 'unset' }}>You Won!</h1>
             </div>
           ) : (
             <div className="text-center">
               <div className="result-icon" style={{ margin: '20px 0 12px' }}>
-                <Trophy size={80} style={{ color: '#6366f1' }} />
+                <Trophy size={80} style={{ color: '#ef4444' }} />
               </div>
-              <h1 style={{ fontSize: '32px', margin: '12px 0' }}>Game Over!</h1>
+              <h1 style={{ fontSize: '32px', color: '#ef4444', fontWeight: '900', margin: '12px 0', background: 'none', WebkitTextFillColor: '#ef4444', backgroundClip: 'unset' }}>Game Over!</h1>
             </div>
           )}
 
           <div className="text-center" style={{ margin: '20px 0' }}>
-            <p className="text-muted" style={{ fontSize: '16px' }}>You placed <strong style={{ color: '#6366f1' }}>#{myRank}</strong></p>
-            <p className="points-earned" style={{ fontSize: '36px', margin: '8px 0' }}>{myScore} pts</p>
+            <p className="text-muted" style={{ fontSize: '16px' }}>You placed <strong style={{ color: isWinner ? '#10b981' : '#64748b' }}>#{myRank}</strong></p>
+            <p style={{ fontSize: '36px', margin: '8px 0', fontWeight: '900', color: isWinner ? '#10b981' : '#ef4444' }}>{myScore} pts</p>
           </div>
         </div>
 
         <div className="leaderboard" style={{ flex: '1 1 auto', marginBottom: '16px' }}>
-          {finalScores.map((player, idx) => (
-            <div
-              key={idx}
-              className={`leaderboard-item ${player.session_id === playerId ? 'current-player' : ''} ${idx === 0 ? 'winner' : ''}`}
-            >
-              <div className="leaderboard-rank">
-                {idx === 0 && <Crown size={18} />}
-                #{idx + 1} {player.name}
+          {finalScores.map((player, idx) => {
+            const isTopScore = player.score === topScore;
+            return (
+              <div
+                key={idx}
+                className={`leaderboard-item ${player.session_id === playerId ? 'current-player' : ''} ${isTopScore ? 'winner' : ''}`}
+              >
+                <div className="leaderboard-rank">
+                  {isTopScore && <Crown size={18} />}
+                  #{idx + 1} {player.name}
+                </div>
+                <div className="leaderboard-score">{player.score} pts</div>
               </div>
-              <div className="leaderboard-score">{player.score} pts</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <button onClick={returnToLobby} className="btn-secondary" style={{ flex: '0 0 auto' }}>

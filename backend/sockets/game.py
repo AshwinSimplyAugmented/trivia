@@ -72,7 +72,8 @@ def register_game_handlers(app, socketio):
         ).first()
 
         if existing_answer:
-            return emit('error', {'message': 'Already answered this question'})
+            # Silently ignore duplicate submissions (frontend already prevents this)
+            return emit('answer_submitted', {'success': True})
 
         # Calculate time taken
         if not lobby.question_start_time:

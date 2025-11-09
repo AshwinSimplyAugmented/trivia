@@ -45,6 +45,8 @@
   --primary-dark: var(--color-primary-dark);
   --primary-light: var(--color-primary-light);
   --secondary: var(--color-secondary);
+  --secondary-dark: var(--color-secondary-dark);
+  --secondary-light: var(--color-secondary-light);
   --success: var(--color-success);
   --danger: var(--color-danger);
   --warning: var(--color-warning);

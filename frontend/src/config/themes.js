@@ -51,36 +51,41 @@ export const THEMES = {
     id: 'christmas',
     name: 'Christmas',
     colors: {
-      primary: '#dc2626',        // Christmas red
-      primaryDark: '#b91c1c',
-      primaryLight: '#f87171',
+      // Christmas RED for buttons (primary)
+      primary: '#b91c1c',        // Dark red for buttons
+      primaryDark: '#7f1d1d',    // Darker red for hover
+      primaryLight: '#dc2626',   // Lighter red
 
-      secondary: '#059669',      // Christmas green
-      secondaryDark: '#047857',
-      secondaryLight: '#34d399',
+      // Christmas GREEN for accents (secondary)
+      secondary: '#059669',      // Christmas green accent
+      secondaryDark: '#047857',  // Darker green
+      secondaryLight: '#10b981', // Lighter green
 
-      success: '#10b981',
-      successDark: '#059669',
-      danger: '#dc2626',
+      // Status colors - green for success/correct!
+      success: '#059669',        // Green (Christmas tree)
+      successDark: '#047857',
+      danger: '#dc2626',         // Bright red
       dangerDark: '#b91c1c',
-      warning: '#f59e0b',
-      warningDark: '#d97706',
+      warning: '#fbbf24',        // Gold
+      warningDark: '#f59e0b',
 
-      gradientMain: 'linear-gradient(135deg, #c31432 0%, #240b36 100%)',
-      gradientCard: 'linear-gradient(135deg, rgba(195, 20, 50, 0.1), rgba(36, 11, 54, 0.1))',
-      background: '#0a1628',
-      surface: 'rgba(220, 38, 38, 0.1)',
+      // SOLID Christmas red background
+      gradientMain: '#c41e3a',   // Solid red background
+      gradientCard: 'rgba(255, 255, 255, 0.05)',
+      background: '#c41e3a',     // Solid red
+      surface: 'rgba(255, 255, 255, 0.1)',
 
+      // Text colors - WHITE on red background
       textPrimary: '#ffffff',
-      textSecondary: 'rgba(255, 255, 255, 0.8)',
-      textMuted: 'rgba(255, 255, 255, 0.6)',
+      textSecondary: 'rgba(255, 255, 255, 0.9)',
+      textMuted: 'rgba(255, 255, 255, 0.7)',
     },
     music: {
       lobby: '/themes/christmas/music/lobby.mp3',
       gameplay: '/themes/christmas/music/gameplay.mp3',
     },
     images: {
-      backgroundPattern: '/themes/christmas/images/snowflakes.png',
+      backgroundPattern: null, // Can add snowflakes later
       logo: null,
     },
   },
