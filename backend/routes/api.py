@@ -48,6 +48,12 @@ def create_api_routes(app):
 
         return jsonify({'success': False, 'message': 'Session not found in this lobby'}), 404
 
+    @api.route('/api/theme', methods=['GET'])
+    def get_theme():
+        """Get the current theme from environment variable"""
+        theme = os.getenv('THEME', 'standard')
+        return jsonify({'theme': theme})
+
     # Enhanced asset-manifest.json route with cache control
     @api.route('/asset-manifest.json')
     def serve_manifest():

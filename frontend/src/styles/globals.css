@@ -9,31 +9,60 @@
 }
 
 /* ==================== CSS VARIABLES ==================== */
+/* These variables are dynamically set by the theme system */
 :root {
-  /* Modern color palette */
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #818cf8;
-  --secondary: #ec4899;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
+  /* Primary colors - set by theme */
+  --color-primary: #6366f1;
+  --color-primary-dark: #4f46e5;
+  --color-primary-light: #818cf8;
+
+  /* Secondary colors - set by theme */
+  --color-secondary: #8b5cf6;
+  --color-secondary-dark: #7c3aed;
+  --color-secondary-light: #a78bfa;
+
+  /* Status colors - set by theme */
+  --color-success: #10b981;
+  --color-success-dark: #059669;
+  --color-danger: #ef4444;
+  --color-danger-dark: #dc2626;
+  --color-warning: #f59e0b;
+  --color-warning-dark: #d97706;
+
+  /* Backgrounds - set by theme */
+  --color-gradient-main: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --color-gradient-card: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  --color-background: #0f172a;
+  --color-surface: rgba(255, 255, 255, 0.1);
+
+  /* Text colors - set by theme */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.7);
+  --color-text-muted: rgba(255, 255, 255, 0.5);
+
+  /* Legacy variables for backwards compatibility (used by index.css) */
+  --primary: var(--color-primary);
+  --primary-dark: var(--color-primary-dark);
+  --primary-light: var(--color-primary-light);
+  --secondary: var(--color-secondary);
+  --success: var(--color-success);
+  --danger: var(--color-danger);
+  --warning: var(--color-warning);
   --gold: #fbbf24;
 
-  /* Neutrals */
-  --bg-dark: #0f172a;
+  --bg-dark: var(--color-background);
   --bg-card: #1e293b;
   --bg-light: #f8fafc;
   --text-dark: #0f172a;
-  --text-light: #f8fafc;
-  --text-muted: #64748b;
+  --text-light: var(--color-text-primary);
+  --text-muted: #64748b; /* Dark muted text for light backgrounds */
+  --text-muted-light: var(--color-text-muted); /* Light muted text for dark backgrounds */
 
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  --gradient-primary: var(--color-gradient-main);
+  --gradient-success: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-dark) 100%);
+  --gradient-danger: linear-gradient(135deg, var(--color-danger) 0%, var(--color-danger-dark) 100%);
   --gradient-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-bg: var(--color-gradient-main);
 }
 
 /* ==================== ANIMATIONS ==================== */

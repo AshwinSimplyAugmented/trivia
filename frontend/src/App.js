@@ -22,6 +22,7 @@ import {
 } from './api/socket';
 import { getSessionId } from './utils/helpers';
 import AudioManager from './services/AudioManager';
+import { getTheme, applyTheme } from './config/themes';
 
 function App() {
   // View states: home, host, host_mode_select, host_question, host_reveal, host_results
@@ -34,6 +35,10 @@ function App() {
   const [error, setError] = useState('');
   const [sessionId, setSessionId] = useState(getSessionId());
   const [isReconnecting, setIsReconnecting] = useState(true);
+
+  // Theme state
+  const [theme, setTheme] = useState(null);
+  const [isLoadingTheme, setIsLoadingTheme] = useState(true);
 
   // Join code input
   const [joinCode, setJoinCode] = useState('');
@@ -86,6 +91,34 @@ function App() {
     setModal(null);
   };
 
+  // Fetch theme on mount (first thing that happens)
+  useEffect(() => {
+    const fetchTheme = async () => {
+      try {
+        const isDev = window.location.hostname === 'localhost' && window.location.port === '3000';
+        const baseURL = isDev ? 'http://localhost:5000' : '';
+
+        const response = await fetch(`${baseURL}/api/theme`);
+        const data = await response.json();
+
+        const themeConfig = getTheme(data.theme);
+        setTheme(themeConfig);
+        applyTheme(themeConfig);
+
+        console.log(`[App] Theme loaded: ${themeConfig.name}`);
+      } catch (error) {
+        console.error('[App] Failed to load theme, using default:', error);
+        const defaultTheme = getTheme('standard');
+        setTheme(defaultTheme);
+        applyTheme(defaultTheme);
+      } finally {
+        setIsLoadingTheme(false);
+      }
+    };
+
+    fetchTheme();
+  }, []);
+
   // Reconnection logic on mount
   useEffect(() => {
     const attemptReconnect = async () => {
@@ -135,16 +168,16 @@ function App() {
     attemptReconnect();
   }, []);
 
-  // Initialize AudioManager on mount (only once)
+  // Initialize AudioManager with theme music (only once, after theme loads)
   useEffect(() => {
-    if (!audioInitialized.current) {
-      console.log('[App] Initializing AudioManager');
-      AudioManager.init();
+    if (!audioInitialized.current && theme) {
+      console.log('[App] Initializing AudioManager with theme:', theme.name);
+      AudioManager.init(theme.music);
       audioInitialized.current = true;
     }
     // No cleanup - AudioManager is a singleton that should persist
     // throughout the app lifecycle. Cleanup only happens on page unload.
-  }, []);
+  }, [theme]);
 
   // Handle audio based on view changes (Host only)
   useEffect(() => {
@@ -483,6 +516,18 @@ function App() {
       </>
     );
   };
+
+  // LOADING SCREEN - Show while theme is loading
+  if (isLoadingTheme) {
+    return (
+      <div className="loading-screen">
+        <Loader2 size={60} className="spinner-icon" />
+        <p style={{ marginTop: '24px', fontSize: '18px', color: 'rgba(255,255,255,0.8)' }}>
+          Loading theme...
+        </p>
+      </div>
+    );
+  }
 
   // HOME VIEW
   if (view === 'home') {

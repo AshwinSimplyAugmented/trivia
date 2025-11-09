@@ -8,6 +8,10 @@ from sockets.connection import register_connection_handlers
 from sockets.lobby import register_lobby_handlers
 from sockets.game import register_game_handlers
 from utils.helpers import start_cleanup_thread
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Create Flask app
 app = Flask(__name__, static_folder=Config.STATIC_FOLDER)

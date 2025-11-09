@@ -36,23 +36,24 @@ class AudioManager {
   /**
    * Initialize the audio manager
    * Preloads all audio assets defined in config
+   * @param {object} musicConfig - Optional music configuration from theme (defaults to AUDIO_CONFIG.bgm)
    */
-  init() {
-    console.log('[AudioManager] Initializing...');
+  init(musicConfig = AUDIO_CONFIG.bgm) {
+    console.log('[AudioManager] Initializing with music config...');
 
-    // Preload BGM tracks
-    Object.keys(AUDIO_CONFIG.bgm).forEach((trackName) => {
-      const config = AUDIO_CONFIG.bgm[trackName];
+    // Preload BGM tracks from provided config
+    Object.keys(musicConfig).forEach((trackName) => {
+      const trackPath = musicConfig[trackName];
       this.bgmTracks[trackName] = new Howl({
-        src: config.src,
-        loop: config.loop,
-        volume: 0, // Start at 0, will fade in when played
+        src: [trackPath], // Theme provides path as string, wrap in array for Howler
+        loop: true,      // All BGM tracks loop by default
+        volume: 0,       // Start at 0, will fade in when played
         preload: true,
         onload: () => {
-          console.log(`[AudioManager] BGM "${trackName}" loaded`);
+          console.log(`[AudioManager] BGM "${trackName}" loaded from ${trackPath}`);
         },
         onloaderror: (id, error) => {
-          console.error(`[AudioManager] Error loading BGM "${trackName}":`, error);
+          console.error(`[AudioManager] Error loading BGM "${trackName}" from ${trackPath}:`, error);
         },
       });
     });
