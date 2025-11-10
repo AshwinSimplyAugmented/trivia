@@ -509,10 +509,80 @@ function App() {
     );
   };
 
+  // VIDEO BACKGROUND COMPONENT - Only for host with video-enabled themes
+  const VideoBackground = () => {
+    const role = localStorage.getItem('role');
+
+    // Only show for host with a theme that has a video background
+    if (role !== 'host' || !theme || !theme.images?.hostBackgroundVideo) {
+      return null;
+    }
+
+    return (
+      <div className="video-background-container">
+        <video
+          key={theme.images.hostBackgroundVideo}
+          className="video-background"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+        >
+          <source src={theme.images.hostBackgroundVideo} type="video/mp4" />
+        </video>
+      </div>
+    );
+  };
+
+  // SNOWFALL COMPONENT - For both host and players with Christmas theme
+  const Snowfall = () => {
+    // Only show for Christmas theme (host and players)
+    if (!theme || theme.id !== 'christmas') {
+      return null;
+    }
+
+    // Generate 150 snowflakes with random properties
+    const snowflakes = [];
+    for (let i = 0; i < 150; i++) {
+      const size = Math.random() * 0.5 + 0.5; // 0.5 to 1
+      const left = Math.random() * 100; // 0 to 100%
+      const animationDuration = Math.random() * 5 + 10; // 10 to 15 seconds
+      const animationDelay = Math.random() * 10; // 0 to 10 seconds
+      const opacity = Math.random() * 0.5 + 0.5; // 0.5 to 1
+      const animationName = Math.random() > 0.5 ? 'snowfall' : 'snowfall-reverse';
+
+      snowflakes.push(
+        <div
+          key={i}
+          className="snowflake"
+          style={{
+            left: `${left}%`,
+            fontSize: `${size}em`,
+            animationName: animationName,
+            animationDuration: `${animationDuration}s`,
+            animationDelay: `${animationDelay}s`,
+            opacity: opacity
+          }}
+        >
+          ❄
+        </div>
+      );
+    }
+
+    return (
+      <div className="snow-container">
+        {snowflakes}
+      </div>
+    );
+  };
+
   // Render toast and modal on every view
   const renderWithNotifications = (content) => {
     return (
       <>
+        <VideoBackground />
+        <Snowfall />
         <ToastNotifications />
         <ConfirmationModal />
         {content}
@@ -680,9 +750,11 @@ function App() {
             </div>
           </div>
 
-          <p className="text-center text-muted" style={{ color: 'rgba(255,255,255,0.7)', fontSize: '18px', marginTop: '32px' }}>
-            Players are answering...
-          </p>
+          <div style={{ textAlign: 'center', marginTop: '32px' }}>
+            <span className="game-status-text">
+              Players are answering...
+            </span>
+          </div>
         </div>
       </div>
     );

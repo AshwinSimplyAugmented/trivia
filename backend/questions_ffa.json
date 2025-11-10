@@ -5,21 +5,123 @@
   "questions": [
     {
       "id": 1,
-      "question": "What is the capital of France?",
-      "answers": ["London", "Paris", "Berlin", "Madrid"],
-      "correct": 1
+      "question": "How many reindeer pull Santa's sleigh (excluding Rudolph)?",
+      "answers": ["6", "7", "8", "9"],
+      "correct": 2
     },
     {
       "id": 2,
-      "question": "Which planet is known as the Red Planet?",
-      "answers": ["Venus", "Jupiter", "Mars", "Saturn"],
-      "correct": 2
+      "question": "What color is the Grinch?",
+      "answers": ["Red", "Green", "Blue", "Purple"],
+      "correct": 1
     },
     {
       "id": 3,
-      "question": "Who painted the Mona Lisa?",
-      "answers": ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"],
+      "question": "In Home Alone, where does Kevin's family go on vacation?",
+      "answers": ["London", "New York", "Paris", "Rome"],
       "correct": 2
+    },
+    {
+      "id": 4,
+      "question": "What do people traditionally put on top of a Christmas tree?",
+      "answers": ["Star or Angel", "Candy Cane", "Bell", "Snowflake"],
+      "correct": 0
+    },
+    {
+      "id": 5,
+      "question": "Which reindeer's name starts with 'B'?",
+      "answers": ["Bashful", "Blitzen", "Bolt", "Blazer"],
+      "correct": 1
+    },
+    {
+      "id": 6,
+      "question": "What does Buddy the Elf put on his spaghetti?",
+      "answers": ["Ketchup", "Chocolate Sauce", "Maple Syrup", "Peanut Butter"],
+      "correct": 2
+    },
+    {
+      "id": 7,
+      "question": "How many ghosts visit Scrooge in A Christmas Carol?",
+      "answers": ["2", "3", "4", "5"],
+      "correct": 2
+    },
+    {
+      "id": 8,
+      "question": "What beverage company has used Santa in its advertising since 1931?",
+      "answers": ["Pepsi", "Coca-Cola", "Dr Pepper", "7-Up"],
+      "correct": 1
+    },
+    {
+      "id": 9,
+      "question": "What is Frosty the Snowman's nose made of?",
+      "answers": ["A Carrot", "A Button", "Coal", "A Cherry"],
+      "correct": 1
+    },
+    {
+      "id": 10,
+      "question": "In The Polar Express, what gift does the boy receive from Santa?",
+      "answers": ["A Toy Train", "A Bell", "A Teddy Bear", "Hot Chocolate"],
+      "correct": 1
+    },
+    {
+      "id": 11,
+      "question": "What Christmas decoration was originally made from strands of silver?",
+      "answers": ["Garland", "Wreaths", "Tinsel", "Ornaments"],
+      "correct": 2
+    },
+    {
+      "id": 12,
+      "question": "Which country started the tradition of putting up a Christmas tree?",
+      "answers": ["United States", "England", "Germany", "Norway"],
+      "correct": 2
+    },
+    {
+      "id": 13,
+      "question": "What is the name of the Grinch's dog?",
+      "answers": ["Max", "Rex", "Spot", "Buddy"],
+      "correct": 0
+    },
+    {
+      "id": 14,
+      "question": "In Elf, what are the four main food groups according to Buddy?",
+      "answers": ["Candy, candy canes, candy corns, syrup", "Cookies, cake, candy, chocolate", "Sugar, sprinkles, syrup, chocolate", "Gumdrops, candy canes, chocolate, cookies"],
+      "correct": 0
+    },
+    {
+      "id": 15,
+      "question": "What were Frosty's first words after coming to life?",
+      "answers": ["Hello, children!", "Merry Christmas!", "Happy Birthday!", "Let's play!"],
+      "correct": 2
+    },
+    {
+      "id": 16,
+      "question": "In the movie Die Hard, what building is the Christmas party held in?",
+      "answers": ["Willis Tower", "Nakatomi Plaza", "Empire State Building", "Chrysler Building"],
+      "correct": 1
+    },
+    {
+      "id": 17,
+      "question": "What year did NORAD start tracking Santa?",
+      "answers": ["1955", "1962", "1970", "1948"],
+      "correct": 0
+    },
+    {
+      "id": 18,
+      "question": "Which US President banned Christmas trees in the White House?",
+      "answers": ["Theodore Roosevelt", "Abraham Lincoln", "Thomas Jefferson", "Franklin Pierce"],
+      "correct": 0
+    },
+    {
+      "id": 19,
+      "question": "In what modern-day country was St. Nicholas born?",
+      "answers": ["Germany", "Netherlands", "Turkey", "Greece"],
+      "correct": 2
+    },
+    {
+      "id": 20,
+      "question": "What Christmas carol was the first song broadcast from space?",
+      "answers": ["Silent Night", "Jingle Bells", "White Christmas", "O Holy Night"],
+      "correct": 1
     }
   ]
 }

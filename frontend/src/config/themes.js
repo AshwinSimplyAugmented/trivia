@@ -42,8 +42,10 @@ export const THEMES = {
       gameplay: '/themes/standard/music/game-music-1.mp3',
     },
     images: {
-      backgroundPattern: null, // optional background pattern overlay
-      logo: null, // optional custom logo
+      hostBackground: null, // No background image for standard theme
+      hostBackgroundVideo: null, // No video background
+      backgroundPattern: null,
+      logo: null,
     },
   },
 
@@ -85,7 +87,9 @@ export const THEMES = {
       gameplay: '/themes/christmas/music/gameplay.mp3',
     },
     images: {
-      backgroundPattern: null, // Can add snowflakes later
+      hostBackground: '/themes/christmas/images/background.jpg', // Fallback image
+      hostBackgroundVideo: '/themes/christmas/videos/background.mp4', // Host-only video background
+      backgroundPattern: null,
       logo: null,
     },
   },
@@ -123,6 +127,8 @@ export const THEMES = {
       gameplay: '/themes/halloween/music/gameplay.mp3',
     },
     images: {
+      hostBackground: null, // Can add later if desired
+      hostBackgroundVideo: null, // Can add later if desired
       backgroundPattern: '/themes/halloween/images/cobwebs.png',
       logo: null,
     },
@@ -145,6 +151,7 @@ export const getTheme = (themeId) => {
 export const applyTheme = (theme) => {
   const root = document.documentElement;
 
+  // Apply color CSS variables
   Object.entries(theme.colors).forEach(([key, value]) => {
     const cssVarName = `--color-${toKebabCase(key)}`;
     root.style.setProperty(cssVarName, value);

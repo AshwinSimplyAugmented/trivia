@@ -14,6 +14,7 @@
   max-height: calc(100vh - 40px);
   overflow-y: auto;
   position: relative;
+  z-index: 10;
   animation: fadeInUp 0.5s ease-out;
   display: flex;
   flex-direction: column;
@@ -48,6 +49,8 @@
 .host-fullscreen .content-wrapper {
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -178,6 +181,7 @@ button:disabled:hover {
   z-index: 1000;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .floating-button:hover {
@@ -263,6 +267,7 @@ input::placeholder {
   color: var(--secondary); /* Fallback for non-webkit browsers */
   margin: 0;
   text-shadow: 0 4px 20px rgba(5, 150, 105, 0.3);
+  animation: lobbyCodePulse 0.65s ease-in-out infinite;
 }
 
 /* ==================== PLAYER LIST ==================== */
@@ -402,6 +407,8 @@ input::placeholder {
   margin: 24px 0;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 10;
 }
 
 .question-text {
@@ -427,6 +434,12 @@ input::placeholder {
   display: flex;
   align-items: center;
   gap: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 12px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .timer-display {
@@ -436,11 +449,31 @@ input::placeholder {
   align-items: center;
   gap: 8px;
   animation: pulse 1s infinite;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 12px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .timer-display.urgent {
   color: var(--danger);
   animation: urgentPulse 0.5s infinite;
+}
+
+.game-status-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  margin-top: 32px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 12px 24px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: inline-block;
 }
 
 @keyframes urgentPulse {

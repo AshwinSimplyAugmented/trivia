@@ -1,0 +1,1 @@
+Can you go through my entire codebase and show me you understand everything? Understand centralized systems, understand different themes, understand the flow, the UI/UX, the differences between host and the user (host is usually on a laptop and the user is usually on mobile), understand the sound system, understand everything. Explore and completely understand my codebase.
