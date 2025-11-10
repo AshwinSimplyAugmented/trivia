@@ -1,0 +1,79 @@
+(venv) PS C:\Users\kadar\Documents\MISC\trivia\backend> flask run
+Database URI: sqlite:///C:/Users/kadar/Documents/MISC/trivia/backend/data/trivia.db
+Database initialized successfully
+Cleanup thread started
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+127.0.0.1 - - [09/Nov/2025 20:33:42] "GET /socket.io/?EIO=4&transport=polling&t=gxzgt13i HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:42] "GET /socket.io/?EIO=4&transport=polling&t=gxzlbpgm HTTP/1.1" 200 -
+Client connected: af8PNpJ8NnoKNZKCAAAC
+127.0.0.1 - - [09/Nov/2025 20:33:42] "POST /socket.io/?EIO=4&transport=polling&t=gxzpsypc&sid=L_RRvKzQij3UUvn2AAAA HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:42] "GET /socket.io/?EIO=4&transport=polling&t=gxzpuzw5&sid=L_RRvKzQij3UUvn2AAAA HTTP/1.1" 200 -
+Client connected: LLcL2MP571aRd38NAAAD
+127.0.0.1 - - [09/Nov/2025 20:33:42] "POST /socket.io/?EIO=4&transport=polling&t=gxzu3dla&sid=voUzbUz50edp2IHRAAAB HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:42] "GET /socket.io/?EIO=4&transport=polling&t=gxzrn2mp HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gxzu5s5a&sid=voUzbUz50edp2IHRAAAB HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gxzyvppw&sid=L_RRvKzQij3UUvn2AAAA HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gxzwj7lf HTTP/1.1" 200 -
+Client connected: dYaN4VOL9TDqb8XtAAAG
+127.0.0.1 - - [09/Nov/2025 20:33:43] "POST /socket.io/?EIO=4&transport=polling&t=gy00f6e8&sid=XYoc_qED6ybSs-YMAAAE HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gy034urz&sid=voUzbUz50edp2IHRAAAB HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gy00ghjo&sid=XYoc_qED6ybSs-YMAAAE HTTP/1.1" 200 -
+Client connected: 9toggWOIYWlP44SdAAAH
+127.0.0.1 - - [09/Nov/2025 20:33:43] "POST /socket.io/?EIO=4&transport=polling&t=gy05zkn6&sid=9AORrNeqgAQh5nuAAAAF HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gy0603wr&sid=9AORrNeqgAQh5nuAAAAF HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gy095o2o&sid=XYoc_qED6ybSs-YMAAAE HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gy05bod0 HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gy05ce7c HTTP/1.1" 200 -
+Client connected: W6iBfUj4Vita6HmYAAAK
+127.0.0.1 - - [09/Nov/2025 20:33:43] "POST /socket.io/?EIO=4&transport=polling&t=gy0gcaff&sid=lBg3GVzBZEfpFaLQAAAI HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gy0gdftc&sid=lBg3GVzBZEfpFaLQAAAI HTTP/1.1" 200 -
+Client connected: vhcSZqHCZf7inaJLAAAL
+127.0.0.1 - - [09/Nov/2025 20:33:43] "POST /socket.io/?EIO=4&transport=polling&t=gy0ge9xu&sid=7H6CAoNSf2mY07R2AAAJ HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gy0gfswk&sid=7H6CAoNSf2mY07R2AAAJ HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:43] "GET /socket.io/?EIO=4&transport=polling&t=gy0pggu9&sid=lBg3GVzBZEfpFaLQAAAI HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:44] "GET /socket.io/?EIO=4&transport=polling&t=gy0pincj&sid=7H6CAoNSf2mY07R2AAAJ HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:44] "GET /socket.io/?EIO=4&transport=polling&t=gy15y9cm HTTP/1.1" 200 -
+Client connected: G15TXVGbKqw8Z8LSAAAN
+127.0.0.1 - - [09/Nov/2025 20:33:44] "POST /socket.io/?EIO=4&transport=polling&t=gy16xp13&sid=gjLe-HT9Or9tdaYyAAAM HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:44] "GET /socket.io/?EIO=4&transport=polling&t=gy16ykjq&sid=gjLe-HT9Or9tdaYyAAAM HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:44] "GET /api/theme HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:45] "GET /api/theme HTTP/1.1" 200 -
+Client disconnected: dYaN4VOL9TDqb8XtAAAG
+Client disconnected: 9toggWOIYWlP44SdAAAH
+127.0.0.1 - - [09/Nov/2025 20:33:45] "GET /socket.io/?EIO=4&transport=websocket&sid=XYoc_qED6ybSs-YMAAAE HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:45] "GET /socket.io/?EIO=4&transport=websocket&sid=9AORrNeqgAQh5nuAAAAF HTTP/1.1" 200 -
+Client disconnected: af8PNpJ8NnoKNZKCAAAC
+Client disconnected: LLcL2MP571aRd38NAAAD
+127.0.0.1 - - [09/Nov/2025 20:33:45] "GET /socket.io/?EIO=4&transport=websocket&sid=L_RRvKzQij3UUvn2AAAA HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:45] "GET /socket.io/?EIO=4&transport=websocket&sid=voUzbUz50edp2IHRAAAB HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:46] "GET /socket.io/?EIO=4&transport=polling&t=gy2gptk0 HTTP/1.1" 200 -
+Client connected: 3tlsvj0QrCZE2YnMAAAP
+127.0.0.1 - - [09/Nov/2025 20:33:46] "POST /socket.io/?EIO=4&transport=polling&t=gy2h12nu&sid=KWovxoxrdRoR6-MjAAAO HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:46] "GET /socket.io/?EIO=4&transport=polling&t=gy2h2jrh&sid=KWovxoxrdRoR6-MjAAAO HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:46] "GET /api/theme HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:46] "GET /socket.io/?EIO=4&transport=polling&t=gy2pv0gh&sid=KWovxoxrdRoR6-MjAAAO HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:46] "GET /api/theme HTTP/1.1" 200 -
+Client disconnected: vhcSZqHCZf7inaJLAAAL
+Client disconnected: W6iBfUj4Vita6HmYAAAK
+127.0.0.1 - - [09/Nov/2025 20:33:47] "GET /socket.io/?EIO=4&transport=websocket&sid=7H6CAoNSf2mY07R2AAAJ HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:47] "GET /socket.io/?EIO=4&transport=websocket&sid=lBg3GVzBZEfpFaLQAAAI HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:48] "GET /api/theme HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:48] "GET /socket.io/?EIO=4&transport=polling&t=gy3zmrxr HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:48] "GET /api/theme HTTP/1.1" 200 -
+Client connected: u4aRZ1IqWnDtvVyKAAAR
+127.0.0.1 - - [09/Nov/2025 20:33:48] "POST /socket.io/?EIO=4&transport=polling&t=gy48sr33&sid=xowRa4AG9HS0NX27AAAQ HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:48] "GET /socket.io/?EIO=4&transport=polling&t=gy48unam&sid=xowRa4AG9HS0NX27AAAQ HTTP/1.1" 200 -
+127.0.0.1 - - [09/Nov/2025 20:33:48] "GET /socket.io/?EIO=4&transport=polling&t=gy4ho555&sid=xowRa4AG9HS0NX27AAAQ HTTP/1.1" 200 -
+Lobby created: GHRP by session 395c560d-70ea-4605-9ab3-948ac6b7868f
+Player test1 joined GHRP
+Player est2 joined GHRP
+Game starting in GHRP - entering mode selection
+Game mode selected: ffa for lobby GHRP
+Starting question 1 in lobby GHRP
+Question sent, waiting for host to notify when audio playback completes...
+[Backend] Received audio_finished event with data: {'code': '', 'question_index': 0}
+[Backend] code=, question_index=0, sid=G15TXVGbKqw8Z8LSAAAN
+[Backend] ERROR: Lobby not found for code

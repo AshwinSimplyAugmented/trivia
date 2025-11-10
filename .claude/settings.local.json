@@ -18,7 +18,8 @@
       "Bash(taskkill:*)",
       "Bash(cmd /c \"taskkill /PID 15496 /F\")",
       "Bash(powershell -Command \"Stop-Process -Id 15496 -Force\")",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []

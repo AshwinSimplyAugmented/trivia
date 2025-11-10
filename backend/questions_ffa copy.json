@@ -23,6 +23,13 @@
       "answers": ["London", "New York", "Paris", "Rome"],
       "correct": 2,
       "audio": "/audio/questions/question-3.mp3"
+    },
+    {
+      "id": 4,
+      "question": "In what year was 'White Christmas' by Bing Crosby released?",
+      "answers": ["1940", "1942", "1945", "1948"],
+      "correct": 1,
+      "audio": "/audio/questions/question-4.mp3"
     }
   ]
 }

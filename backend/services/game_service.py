@@ -34,20 +34,15 @@ def start_question(app, socketio, code):
         lobby.question_start_time = datetime.utcnow()
         db.session.commit()
 
-        print(f"Starting question {question_index + 1} in lobby {code}")
-
         # Send question to all clients
         socketio.emit('question_started', {
             'question_index': question_index,
             'question': question_data['question'],
             'answers': question_data['answers'],
             'time_limit': mode_config['time_per_question'],
-            'total_questions': len(questions)
+            'total_questions': len(questions),
+            'audio': question_data.get('audio')  # Include audio path if available
         }, room=code)
-
-        # Auto-end question after time limit
-        time_limit = mode_config['time_per_question']
-        threading.Timer(time_limit, lambda: end_question(app, socketio, code)).start()
 
 def end_question(app, socketio, code):
     """End the current question and show results"""
@@ -80,8 +75,6 @@ def end_question(app, socketio, code):
                     'points': answer.points_earned,
                     'session_id': player.session_id
                 })
-
-        print(f"Ending question {question_index + 1} in lobby {code}")
 
         # Change status to reveal
         lobby.status = 'reveal'
@@ -136,8 +129,6 @@ def end_game(app, socketio, code):
         ]
 
         winner = final_scores[0] if final_scores else None
-
-        print(f"Game ended in lobby {code}. Winner: {winner['name'] if winner else 'None'}")
 
         socketio.emit('game_ended', {
             'final_scores': final_scores,

@@ -18,7 +18,8 @@ import {
   submitAnswer,
   leaveLobby,
   disbandLobby,
-  reconnectToLobby
+  reconnectToLobby,
+  notifyAudioFinished
 } from './api/socket';
 import { getSessionId } from './utils/helpers';
 import AudioManager from './services/AudioManager';
@@ -66,6 +67,7 @@ function App() {
   const selectedAnswerRef = useRef(null);
   const toastIdCounter = useRef(0);
   const audioInitialized = useRef(false);
+  const questionAudioRef = useRef(null);
 
   // Toast functions
   const showToast = (message, type = 'info') => {
@@ -256,6 +258,12 @@ function App() {
         console.log('Game mode selected:', data.mode_name);
       },
       onQuestionStarted: (data) => {
+        // Clean up any existing audio
+        if (questionAudioRef.current) {
+          questionAudioRef.current.pause();
+          questionAudioRef.current = null;
+        }
+
         setCurrentQuestion(data.question);
         setCurrentAnswers(data.answers);
         setQuestionIndex(data.question_index);
@@ -271,11 +279,35 @@ function App() {
         const role = localStorage.getItem('role');
         if (role === 'host') {
           setView('host_question');
+
+          // ONLY HOST plays audio narration and notifies backend when done
+          if (data.audio) {
+            const questionAudio = new Audio(data.audio);
+            questionAudioRef.current = questionAudio;
+
+            // When audio finishes, notify backend to start timer for everyone
+            questionAudio.onended = () => {
+              notifyAudioFinished(data.question_index);
+            };
+
+            // Error handling - if audio fails, notify backend immediately
+            questionAudio.onerror = () => {
+              notifyAudioFinished(data.question_index);
+            };
+
+            // Start playing
+            questionAudio.play().catch(() => {
+              notifyAudioFinished(data.question_index);
+            });
+          } else {
+            // No audio, notify backend immediately to start timer
+            notifyAudioFinished(data.question_index);
+          }
         } else {
           setView('player_question');
         }
-
-        // Start timer
+      },
+      onTimerStart: (data) => {
         startTimer(data.time_limit);
       },
       onAnswerSubmitted: (data) => {
@@ -367,20 +399,22 @@ function App() {
   }, [playerId]);
 
   const startTimer = (duration) => {
-    let remaining = duration;
-    setTimeRemaining(remaining);
+    setTimeRemaining(duration);
 
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
 
     timerRef.current = setInterval(() => {
-      remaining -= 1;
-      setTimeRemaining(remaining);
+      setTimeRemaining(prev => {
+        const newValue = prev - 1;
 
-      if (remaining <= 0) {
-        clearInterval(timerRef.current);
-      }
+        if (newValue <= 0) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return newValue;
+      });
     }, 1000);
   };
 

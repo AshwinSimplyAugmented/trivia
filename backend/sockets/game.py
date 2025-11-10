@@ -4,7 +4,7 @@ import threading
 from datetime import datetime
 from models import db, Lobby, Player, SocketSession, PlayerAnswer
 from config import GAME_MODES
-from services.game_service import calculate_points, start_question
+from services.game_service import calculate_points, start_question, end_question
 
 def register_game_handlers(app, socketio):
     """Register game-related socket handlers"""
@@ -114,3 +114,38 @@ def register_game_handlers(app, socketio):
             'question_index': question_index,
             'answer_index': answer_index
         })
+
+    @socketio.on('audio_finished')
+    def on_audio_finished(data):
+        """Handle notification from host that audio has finished playing"""
+        sid = request.sid
+        question_index = data.get('question_index')
+
+        # Get lobby code from socket session
+        socket_session = SocketSession.query.filter_by(socket_id=sid).first()
+        if not socket_session:
+            return emit('error', {'message': 'Socket session not found'})
+
+        code = socket_session.lobby_code
+        lobby = Lobby.query.filter_by(code=code).first()
+        if not lobby:
+            return emit('error', {'message': 'Lobby not found'})
+
+        # Verify user is the host
+        if socket_session.session_id != lobby.host_session_id:
+            return emit('error', {'message': 'Only host can notify audio finished'})
+
+        # Verify this is the current question
+        if lobby.current_question_index != question_index:
+            return
+
+        mode_config = GAME_MODES[lobby.game_mode]
+        time_limit = mode_config['time_per_question']
+
+        # Send timer_start to everyone
+        socketio.emit('timer_start', {
+            'time_limit': time_limit
+        }, room=code)
+
+        # Auto-end question after the answer time
+        threading.Timer(time_limit, lambda: end_question(app, socketio, code)).start()

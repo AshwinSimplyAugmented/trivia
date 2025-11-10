@@ -1,0 +1,217 @@
+{
+  "mode": "free_for_all",
+  "mode_display_name": "Free For All",
+  "time_per_question": 10,
+  "questions": [
+    {
+      "id": 1,
+      "question": "How many reindeer pull Santa's sleigh (excluding Rudolph)?",
+      "answers": ["6", "7", "8", "9"],
+      "correct": 2
+    },
+    {
+      "id": 2,
+      "question": "What was the original title of 'The Little Drummer Boy'?",
+      "answers": ["Carol of the Drum", "Boy with a Drum", "Drummer's Song", "March of the Drummer"],
+      "correct": 0
+    },
+    {
+      "id": 3,
+      "question": "In Home Alone, where does Kevin's family go on vacation?",
+      "answers": ["London", "New York", "Paris", "Rome"],
+      "correct": 2
+    },
+    {
+      "id": 4,
+      "question": "In what year was 'White Christmas' by Bing Crosby released?",
+      "answers": ["1940", "1942", "1945", "1948"],
+      "correct": 1
+    },
+    {
+      "id": 5,
+      "question": "What does the word 'Noel' mean in its original language?",
+      "answers": ["Joy", "Peace", "Birth", "Star"],
+      "correct": 2
+    },
+    {
+      "id": 6,
+      "question": "What does Buddy the Elf put on his spaghetti?",
+      "answers": ["Ketchup", "Chocolate Sauce", "Maple Syrup", "Peanut Butter"],
+      "correct": 2
+    },
+    {
+      "id": 7,
+      "question": "How many ghosts visit Scrooge in A Christmas Carol?",
+      "answers": ["2", "3", "4", "5"],
+      "correct": 2
+    },
+    {
+      "id": 8,
+      "question": "What beverage company has used Santa in its advertising since 1931?",
+      "answers": ["Pepsi", "Coca-Cola", "Dr Pepper", "7-Up"],
+      "correct": 1
+    },
+    {
+      "id": 9,
+      "question": "Which country gifts the Trafalgar Square Christmas tree to London each year?",
+      "answers": ["Canada", "Norway", "Sweden", "Finland"],
+      "correct": 1
+    },
+    {
+      "id": 10,
+      "question": "In The Polar Express, what gift does the boy receive from Santa?",
+      "answers": ["A Toy Train", "A Bell", "A Teddy Bear", "Hot Chocolate"],
+      "correct": 1
+    },
+    {
+      "id": 11,
+      "question": "What Christmas decoration was originally made from strands of silver?",
+      "answers": ["Garland", "Wreaths", "Tinsel", "Ornaments"],
+      "correct": 2
+    },
+    {
+      "id": 12,
+      "question": "Which country started the tradition of putting up a Christmas tree?",
+      "answers": ["United States", "England", "Germany", "Norway"],
+      "correct": 2
+    },
+    {
+      "id": 13,
+      "question": "What is the name of the Grinch's dog?",
+      "answers": ["Max", "Rex", "Spot", "Buddy"],
+      "correct": 0
+    },
+    {
+      "id": 14,
+      "question": "In Elf, what are the four main food groups according to Buddy?",
+      "answers": ["Candy, candy canes, candy corns, syrup", "Cookies, cake, candy, chocolate", "Sugar, sprinkles, syrup, chocolate", "Gumdrops, candy canes, chocolate, cookies"],
+      "correct": 0
+    },
+    {
+      "id": 15,
+      "question": "What were Frosty's first words after coming to life?",
+      "answers": ["Hello, children!", "Merry Christmas!", "Happy Birthday!", "Let's play!"],
+      "correct": 2
+    },
+    {
+      "id": 16,
+      "question": "In the movie Die Hard, what building is the Christmas party held in?",
+      "answers": ["Willis Tower", "Nakatomi Plaza", "Empire State Building", "Chrysler Building"],
+      "correct": 1
+    },
+    {
+      "id": 17,
+      "question": "What year did NORAD start tracking Santa?",
+      "answers": ["1955", "1962", "1970", "1948"],
+      "correct": 0
+    },
+    {
+      "id": 18,
+      "question": "Which US President banned Christmas trees in the White House?",
+      "answers": ["Theodore Roosevelt", "Abraham Lincoln", "Thomas Jefferson", "Franklin Pierce"],
+      "correct": 0
+    },
+    {
+      "id": 19,
+      "question": "In what modern-day country was St. Nicholas born?",
+      "answers": ["Germany", "Netherlands", "Turkey", "Greece"],
+      "correct": 2
+    },
+    {
+      "id": 20,
+      "question": "What Christmas carol was the first song broadcast from space?",
+      "answers": ["Silent Night", "Jingle Bells", "White Christmas", "O Holy Night"],
+      "correct": 1
+    },
+    {
+      "id": 21,
+      "question": "What Christmas movie has made the most money at the box office?",
+      "answers": ["Home Alone", "The Grinch (2018)", "Elf", "The Polar Express"],
+      "correct": 1
+    },
+    {
+      "id": 22,
+      "question": "What do children in Sweden leave for Santa?",
+      "answers": ["Milk and Cookies", "Coffee", "Rice Pudding", "Hot Chocolate"],
+      "correct": 1
+    },
+    {
+      "id": 23,
+      "question": "Which reindeer is Rudolph's father?",
+      "answers": ["Dasher", "Donner", "Blitzen", "Comet"],
+      "correct": 1
+    },
+    {
+      "id": 24,
+      "question": "What color are mistletoe berries?",
+      "answers": ["Red", "White", "Green", "Blue"],
+      "correct": 1
+    },
+    {
+      "id": 25,
+      "question": "In 'A Charlie Brown Christmas', what does Lucy want for Christmas?",
+      "answers": ["A Bicycle", "A Dollhouse", "Real Estate", "Money"],
+      "correct": 2
+    },
+    {
+      "id": 26,
+      "question": "What is the best-selling Christmas single of all time?",
+      "answers": ["White Christmas", "All I Want for Christmas Is You", "Last Christmas", "Silent Night"],
+      "correct": 0
+    },
+    {
+      "id": 27,
+      "question": "How many gifts in total are given in 'The Twelve Days of Christmas'?",
+      "answers": ["78", "144", "364", "156"],
+      "correct": 2
+    },
+    {
+      "id": 28,
+      "question": "What Christmas-themed ballet premiered in Russia in 1892?",
+      "answers": ["Swan Lake", "The Nutcracker", "Sleeping Beauty", "Giselle"],
+      "correct": 1
+    },
+    {
+      "id": 29,
+      "question": "In Japan, what fast food is traditionally eaten on Christmas?",
+      "answers": ["McDonald's", "Pizza", "KFC", "Burger King"],
+      "correct": 2
+    },
+    {
+      "id": 30,
+      "question": "What's the name of the evil magician in Frosty the Snowman?",
+      "answers": ["Professor Hinkle", "Mr. Freeze", "Jack Frost", "Winter Warlock"],
+      "correct": 0
+    },
+    {
+      "id": 31,
+      "question": "Which fairy tale inspired the first gingerbread houses?",
+      "answers": ["Snow White", "Hansel and Gretel", "Goldilocks", "Little Red Riding Hood"],
+      "correct": 1
+    },
+    {
+      "id": 32,
+      "question": "What was the first company to use Santa Claus in advertising?",
+      "answers": ["Coca-Cola", "White Rock Beverages", "Macy's", "Montgomery Ward"],
+      "correct": 1
+    },
+    {
+      "id": 33,
+      "question": "In what century was the first written use of 'Xmas'?",
+      "answers": ["12th century", "14th century", "16th century", "18th century"],
+      "correct": 2
+    },
+    {
+      "id": 34,
+      "question": "What astronomical event is the Star of Bethlehem thought to have been?",
+      "answers": ["Supernova", "Conjunction of Jupiter and Saturn", "Halley's Comet", "Venus at its brightest"],
+      "correct": 1
+    },
+    {
+      "id": 35,
+      "question": "Which Christmas song was written during a heatwave in Hollywood?",
+      "answers": ["White Christmas", "Let It Snow", "Winter Wonderland", "Frosty the Snowman"],
+      "correct": 1
+    }
+  ]
+}

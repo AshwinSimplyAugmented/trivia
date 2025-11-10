@@ -1,0 +1,38 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+socket.js:33 Connected to server
+themes.js:160 [Theme] Applied theme: Christmas
+App.js:110 [App] Theme loaded: Christmas
+App.js:176 [App] Initializing AudioManager with theme: Christmas
+AudioManager.js:42 [AudioManager] Initializing with music config...
+AudioManager.js:77 [AudioManager] Initialization complete
+themes.js:160 [Theme] Applied theme: Christmas
+App.js:110 [App] Theme loaded: Christmas
+AudioManager.js:53 [AudioManager] BGM "lobby" loaded from /themes/christmas/music/lobby.mp3
+AudioManager.js:53 [AudioManager] BGM "gameplay" loaded from /themes/christmas/music/gameplay.mp3
+AudioManager.js:87 [AudioManager] Unlocking audio for mobile...
+AudioManager.js:95 [AudioManager] Audio unlocked
+App.js:198 [App] Playing lobby music
+AudioManager.js:119 [AudioManager] Playing BGM: lobby
+App.js:198 [App] Playing lobby music
+AudioManager.js:109 [AudioManager] BGM "lobby" already playing
+App.js:258 Game mode selected: Free For All
+App.js:261 [Question Started] Received question: 0
+App.js:287 [Audio] Creating and playing question audio
+App.js:320 [Question Started] Waiting for timer_start event...
+App.js:202 [App] Cross-fading to gameplay music
+AudioManager.js:119 [AudioManager] Playing BGM: gameplay
+AudioManager.js:123 [AudioManager] Cross-fading from "lobby" to "gameplay"
+AudioManager.js:134 [AudioManager] Stopped old track: gameplay
+App.js:293 [Audio] Audio playback finished, notifying backend
+App.js:294 [Audio] lobbyCode:  questionIndex: 0
+socket.js:196 [Socket] Emitting audio_finished event: 
+{code: '', question_index: 0}
+code
+: 
+""
+question_index
+: 
+0
+[[Prototype]]
+: 
+Object

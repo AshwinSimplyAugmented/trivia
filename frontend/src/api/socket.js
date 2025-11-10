@@ -19,6 +19,7 @@ export function initializeSocketListeners(handlers) {
     onModeSelectionStarted,
     onGameModeSelected,
     onQuestionStarted,
+    onTimerStart,
     onAnswerSubmitted,
     onQuestionEnded,
     onGameEnded,
@@ -61,6 +62,11 @@ export function initializeSocketListeners(handlers) {
   // Question started
   socket.on('question_started', (data) => {
     if (onQuestionStarted) onQuestionStarted(data);
+  });
+
+  // Timer start (after audio completes)
+  socket.on('timer_start', (data) => {
+    if (onTimerStart) onTimerStart(data);
   });
 
   // Answer submitted confirmation
@@ -179,6 +185,14 @@ export function leaveLobby() {
  */
 export function disbandLobby(code) {
   socket.emit('disband_lobby', { code });
+}
+
+/**
+ * Emit audio finished event (host only)
+ * @param {number} questionIndex - The question index
+ */
+export function notifyAudioFinished(questionIndex) {
+  socket.emit('audio_finished', { question_index: questionIndex });
 }
 
 /**

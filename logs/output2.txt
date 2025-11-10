@@ -1,0 +1,23 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+themes.js:160 [Theme] Applied theme: Christmas
+App.js:110 [App] Theme loaded: Christmas
+App.js:176 [App] Initializing AudioManager with theme: Christmas
+AudioManager.js:42 [AudioManager] Initializing with music config...
+AudioManager.js:77 [AudioManager] Initialization complete
+socket.js:33 Connected to server
+themes.js:160 [Theme] Applied theme: Christmas
+App.js:110 [App] Theme loaded: Christmas
+AudioManager.js:53 [AudioManager] BGM "lobby" loaded from /themes/christmas/music/lobby.mp3
+AudioManager.js:53 [AudioManager] BGM "gameplay" loaded from /themes/christmas/music/gameplay.mp3
+howler.js:525 The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio
+_autoResume @ howler.js:525
+unlock @ howler.js:369Understand this warning
+howler.js:380 The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio
+unlock @ howler.js:380Understand this warning
+howler.js:385 The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio
+unlock @ howler.js:385Understand this warning
+AudioManager.js:87 [AudioManager] Unlocking audio for mobile...
+AudioManager.js:95 [AudioManager] Audio unlocked
+App.js:258 Game mode selected: Free For All
+App.js:261 [Question Started] Received question: 0
+App.js:320 [Question Started] Waiting for timer_start event...
